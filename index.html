@@ -600,6 +600,7 @@ async function boot() {
   if (PHONE) {
     S = normalize(cache || SEED); storage = 'phone'; renderAll();
     try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
+    if (await takeSharedFile()) return;
     if (!cache) showPhoneWelcome();
     return;
   }
@@ -681,7 +682,7 @@ async function sendToPhone() {
   toast('File saved. Send it to your phone on WhatsApp, then in Price Desk on the phone tap “Load from PC file”.');
 }
 async function readJsonFile(accept) {
-  const f = await pickFile(accept || '.json,application/json'); if (!f) return null;
+  const f = await pickFile(PHONE ? '' : (accept || '.json,application/json')); if (!f) return null;
   let d; try { d = JSON.parse(await f.text()); } catch (e) { toast('That file is not a valid Price Desk file.', true); return null; }
   if (!validData(d)) { toast('That file is not a Price Desk data file.', true); return null; }
   return d;
@@ -699,8 +700,8 @@ async function loadPhoneFile() {
   S = n; LS.set('pd-away', null); await persist(); renderAll();
   toast(`Phone data loaded: ${counts(S)}.`);
 }
-async function loadFromPC() {
-  const d = await readJsonFile('.json,application/json,text/plain'); if (!d) return;
+async function loadFromPC(shared) {
+  const d = (shared && !(shared instanceof Event) && validData(shared)) ? shared : await readJsonFile('.json,application/json,text/plain'); if (!d) return;
   const n = normalize(d), notes = [];
   if (phoneUnsent()) notes.push('This phone has changes that were never sent to the PC. They will be replaced.');
   if (n.meta.savedAt && S.meta.savedAt && n.meta.savedAt < S.meta.savedAt && S.vendors.length) notes.push(`This file (${fmtWhen(n.meta.savedAt)}) is OLDER than the data on this phone (${fmtWhen(S.meta.savedAt)}).`);
@@ -722,6 +723,16 @@ async function sendToPC() {
   }
   download(name, json); mark(); toast('File saved to Downloads. Send it to the PC on WhatsApp.');
 }
+async function takeSharedFile() {
+  if (!/[?&]shared=1/.test(location.search) || !('caches' in window)) return false;
+  history.replaceState(null, '', location.pathname);
+  let text = null;
+  try { const c = await caches.open('pricedesk-share'); const r = await c.match('shared-file'); if (r) { text = await r.text(); await c.delete('shared-file'); } } catch (e) {}
+  if (!text) { toast('Nothing was received — try sharing the file again.', true); return false; }
+  let d; try { d = JSON.parse(text); } catch (e) { toast('The shared file is not a Price Desk file.', true); return false; }
+  if (!validData(d)) { toast('The shared file is not a Price Desk file.', true); return false; }
+  closeModal(); await loadFromPC(d); return true;
+}
 function showPhoneWelcome() {
   openModal(`<div class="welcome"><header><h2>Price Desk on your phone</h2>
     <p>Load the file you sent from the PC. Everything you change here is saved on this phone; on Monday tap “Send to PC”.</p></header>
@@ -729,7 +740,7 @@ function showPhoneWelcome() {
       <button class="primary" data-m="load">Load from PC file<small>Pick the PriceDesk-to-phone file you received on WhatsApp.</small></button>
       <button data-m="empty">Start without data<small>You can load the file later from Data &amp; backup.</small></button>
     </div></div>`, m => {
-    m.querySelector('[data-m=load]').onclick = loadFromPC;
+    m.querySelector('[data-m=load]').onclick = () => loadFromPC();
     m.querySelector('[data-m=empty]').onclick = () => { closeModal(); renderAll(); };
   }, true);
 }
@@ -972,9 +983,77 @@ function drawGridImage(g, title) {
   });
   return cv;
 }
+/* phone share: one card per item, suppliers cheapest first */
+function drawCardsImage(g, title) {
+  const W = 720, PAD = 18, CP = 16, SC = 2, F = 'Roboto, "Segoe UI", Arial, sans-serif';
+  const C = { ink: '#1B2A3A', mute: '#66768A', line: '#D5DCE3', head: '#EEF3F8', navy: '#1F4E79', lowBg: '#D4F1DB', lowBar: '#2E9E4F', lowInk: '#0B6B1F', alBg: '#DDEBF8', alBar: '#4A8BD0', alInk: '#1F4E79', short: '#C55A11' };
+  const cv = document.createElement('canvas'), ctx = cv.getContext('2d');
+  const font = (w, sz) => `${w} ${sz}px ${F}`;
+  const wrap = (t, w, f) => { ctx.font = f; const out = []; let cur = ''; String(t || '').split(/\s+/).forEach(wd => { const x = cur ? cur + ' ' + wd : wd; if (ctx.measureText(x).width > w && cur) { out.push(cur); cur = wd; } else cur = x; }); if (cur) out.push(cur); return out; };
+  const nameOf = i => (g.names && g.names[i]) || String(g.sups[i]).replace(/\s*\([^)]*\)\s*$/, '');
+  const rr = (x, y, w, h, r) => { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); };
+  const txt = (t, x, y, f, col, align) => { ctx.font = f; ctx.fillStyle = col; ctx.textAlign = align || 'left'; ctx.fillText(t, x, y); };
+  const strikeTxt = (t, xr, y, f, col) => { ctx.font = f; const w = ctx.measureText(t).width; txt(t, xr, y, f, col, 'right'); ctx.strokeStyle = col; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(xr - w, y - 5); ctx.lineTo(xr, y - 5); ctx.stroke(); };
+  /* build each card's rows */
+  const cards = g.rows.map(r => {
+    const need = num(r.qty), b = gridBest(r);
+    const al = allocate(need, r.cells.map((c, i) => ({ i, p: c.p, q: c.q === undefined ? NaN : c.q })));
+    const order = new Map(al ? al.parts.map((x, k) => [x.i, { qty: x.qty, k }]) : []);
+    const offers = r.cells.map((c, i) => ({ c, i })).filter(o => !isNaN(o.c.p)).sort((a, b2) => a.c.p - b2.c.p);
+    const rows = offers.map(({ c, i }) => {
+      const od = order.get(i), hq = c.q !== undefined && !isNaN(c.q), low = c.p === b;
+      const meta = []; if (hq) meta.push({ t: `Avail ${fmtQty(c.q)}`, col: hq && !isNaN(need) && c.q < need && !od ? C.short : C.mute, b: hq && !isNaN(need) && c.q < need && !od });
+      if (od) meta.push({ t: `Order ${fmtQty(od.qty)} pcs`, col: low ? C.lowInk : C.alInk, b: 1 });
+      return { name: nameOf(i), brand: c.m || '', p: c.p, o: hasO(c) ? c.o : NaN, low, split: od && od.k > 0, meta, h: 56 + (hasO(c) ? 14 : 0) + (meta.length ? 20 : 0) };
+    });
+    let foot;
+    if (al) foot = { lines: al.parts.map(x => ({ t: `${nameOf(x.i)}${r.cells[x.i].m ? ' (' + r.cells[x.i].m + ')' : ''}`, v: `${fmtQty(x.qty)} pcs @ ${money(x.p)}` })).concat(al.short ? [{ t: 'Short', v: `${fmtQty(al.short)} pcs`, short: 1 }] : []), label: 'Split order' };
+    else if (!isNaN(b)) { const i = r.cells.findIndex(c => c.p === b); foot = { lines: [{ t: `${nameOf(i)}${r.cells[i].m ? ' (' + r.cells[i].m + ')' : ''}`, v: money(b) }], label: 'Best price' }; }
+    const desc = wrap(r.desc, W - PAD * 2 - CP * 2 - 90, font(400, 15));
+    const headH = 18 + 22 + desc.length * 20 + 10;
+    const footH = foot ? 44 + foot.lines.length * 22 : 0;
+    return { r, rows, foot, desc, headH, footH, h: headH + (rows.length ? rows.reduce((a, x) => a + x.h, 0) : 44) + footH };
+  });
+  const titleH = title ? 46 : 8, H = PAD + titleH + cards.reduce((a, c) => a + c.h + 14, 0) + 20;
+  cv.width = W * SC; cv.height = H * SC; ctx.scale(SC, SC); ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = '#F2F5F8'; ctx.fillRect(0, 0, W, H);
+  if (title) txt(title, PAD, PAD + 22, font(700, 20), C.navy);
+  let y = PAD + titleH; const X = PAD, CW = W - PAD * 2;
+  cards.forEach(cd => {
+    ctx.save(); rr(X, y, CW, cd.h, 14); ctx.fillStyle = '#fff'; ctx.fill(); ctx.clip();
+    ctx.fillStyle = C.head; ctx.fillRect(X, y, CW, cd.headH);
+    txt(cd.r.code || '—', X + CP, y + 30, font(700, 19), C.ink);
+    if (String(cd.r.qty).trim()) txt(`Qty ${cd.r.qty}`, X + CW - CP, y + 30, font(700, 17), C.navy, 'right');
+    cd.desc.forEach((l, k) => txt(l, X + CP, y + 52 + k * 20, font(400, 15), C.mute));
+    let ry = y + cd.headH;
+    if (!cd.rows.length) { txt('Waiting for prices', X + CP, ry + 28, font(600, 15), C.short); ry += 44; }
+    cd.rows.forEach(row => {
+      if (row.low || row.split) { ctx.fillStyle = row.low ? C.lowBg : C.alBg; ctx.fillRect(X, ry, CW, row.h); ctx.fillStyle = row.low ? C.lowBar : C.alBar; ctx.fillRect(X, ry, 5, row.h); }
+      ctx.fillStyle = C.line; ctx.fillRect(X, ry, CW, 1);
+      const ink = row.low ? C.lowInk : row.split ? C.alInk : C.ink;
+      txt(row.name, X + CP, ry + 26, font(700, 17), C.ink);
+      if (row.brand) txt(row.brand, X + CP, ry + 46, font(400, 14), C.mute);
+      let py = ry + 30;
+      if (!isNaN(row.o)) { strikeTxt(money(row.o), X + CW - CP, ry + 22, font(400, 13), '#8A96A3'); py += 12; }
+      txt(money(row.p), X + CW - CP, py + 2, font(700, 21), ink, 'right');
+      if (row.meta.length) { let mx = X + CW - CP; row.meta.slice().reverse().forEach(m => { ctx.font = font(m.b ? 700 : 500, 13); const w = ctx.measureText(m.t).width; txt(m.t, mx, ry + row.h - 12, font(m.b ? 700 : 500, 13), m.col, 'right'); mx -= w + 14; }); }
+      ry += row.h;
+    });
+    if (cd.foot) {
+      ctx.fillStyle = C.line; ctx.fillRect(X, ry, CW, 1);
+      ctx.fillStyle = '#F7FAF8'; ctx.fillRect(X, ry + 1, CW, cd.footH - 1);
+      txt(cd.foot.label.toUpperCase(), X + CP, ry + 24, font(700, 12), C.lowInk);
+      cd.foot.lines.forEach((l, k) => { const yy = ry + 48 + k * 22; txt(l.t, X + CP, yy, font(600, 15), l.short ? C.short : C.ink); txt(l.v, X + CW - CP, yy, font(700, 15), l.short ? C.short : C.lowInk, 'right'); });
+    }
+    ctx.restore();
+    ctx.strokeStyle = C.line; ctx.lineWidth = 1; rr(X + .5, y + .5, CW - 1, cd.h - 1, 14); ctx.stroke();
+    y += cd.h + 14;
+  });
+  return cv;
+}
 async function shareGridImage(g, title) {
   if (!g.sups.length) return toast('Enter at least one price first.', true);
-  const cv = drawGridImage(g, title), blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+  const cv = PHONE ? drawCardsImage(g, title) : drawGridImage(g, title), blob = await new Promise(r => cv.toBlob(r, 'image/png'));
   const name = `Comparison-${(title || 'prices').replace(/[^\w\-]+/g, '_').slice(0, 50)}.png`;
   const file = new File([blob], name, { type: 'image/png' });
   if (PHONE && navigator.canShare && navigator.canShare({ files: [file] })) {
