@@ -1,0 +1,1945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Price Desk</title>
+<script>(function(){var p;try{p=localStorage.getItem("pd-theme")}catch(e){}p=p||"auto";var d=p==="dark"||(p==="auto"&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.dataset.theme=d?"dark":"light";})();</script>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1F4E79">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
+<style>
+/* ---------- theme tokens ---------- */
+:root{
+  --bg:#EEF2F5; --surface:#FFFFFF; --surface-2:#F6F8FA; --head:#E6ECF1; --head-2:#EEF2F6;
+  --line:#D5DCE3; --line-2:#E8EDF1; --soft:#EBF0F4; --hover:#F8FAFC; --focus:#EAF3FC;
+  --ink:#1B2A3A; --mute:#66768A; --faint:#A9B4BF;
+  --accent:#1F4E79; --btn:#1F4E79; --btn-2:#173B5C; --on-btn:#FFFFFF;
+  --top:#1F4E79; --top-ink:#C4D6E8; --top-chip:rgba(255,255,255,.1);
+  --low-bg:#CDEFD5; --low-ink:#0B6B1F; --low-ink-2:#2F6B3A; --low-bar:#2E9E4F;
+  --alloc-bg:#DCEAF8; --alloc-ink:#1F4E79; --alloc-bar:#4A8BD0;
+  --amber:#9A5B00; --amber-bg:#FFF1D6; --amber-line:#F0D9A8; --red:#A61B1B; --red-bg:#FBE9E9;
+  --cat-bg:#E3EDF7; --shadow:rgba(20,45,70,.16); --scrim:rgba(15,30,45,.45); --card-shadow:0 1px 2px rgba(20,45,70,.06);
+  --navy:var(--accent);
+  --ui:'Barlow','Segoe UI',system-ui,sans-serif; --cond:'Barlow Semi Condensed','Segoe UI',system-ui,sans-serif;
+  color-scheme:light;
+}
+html[data-theme=dark]{
+  --bg:#0E151C; --surface:#151F29; --surface-2:#18222D; --head:#1C2935; --head-2:#17212B;
+  --line:#2A3947; --line-2:#202D3A; --soft:#1F2B37; --hover:#18232E; --focus:#1A2C3E;
+  --ink:#E2E9F0; --mute:#8D9EAF; --faint:#5C6E80;
+  --accent:#72B4F2; --btn:#2D6CA9; --btn-2:#3B7CBC; --on-btn:#FFFFFF;
+  --top:#0A121A; --top-ink:#9DB2C6; --top-chip:rgba(255,255,255,.07);
+  --low-bg:#163723; --low-ink:#7FE09A; --low-ink-2:#9ED8AE; --low-bar:#3FBF68;
+  --alloc-bg:#16304A; --alloc-ink:#97C8F5; --alloc-bar:#5AA2E6;
+  --amber:#F2B45C; --amber-bg:#30240E; --amber-line:#5A4318; --red:#FF8C8C; --red-bg:#3A1D1D;
+  --cat-bg:#1C3249; --shadow:rgba(0,0,0,.55); --scrim:rgba(0,0,0,.6); --card-shadow:0 1px 2px rgba(0,0,0,.4);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:var(--ui);font-size:14px;color:var(--ink);background:var(--bg);min-height:100vh}
+button{font:600 14px var(--ui);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:7px;padding:7px 13px;cursor:pointer;white-space:nowrap;transition:background .12s,border-color .12s,color .12s}
+button:hover{border-color:var(--faint)}
+button.primary{background:var(--btn);border-color:var(--btn);color:var(--on-btn)}
+button.primary:hover{background:var(--btn-2);border-color:var(--btn-2)}
+button.ghost{background:transparent;border-color:transparent;color:var(--mute)}
+button.ghost:hover{color:var(--ink);border-color:var(--line)}
+button.danger{color:var(--red)}
+button:disabled{opacity:.5;cursor:default}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.x{border:0;background:none;color:var(--faint);padding:4px 8px;font-size:16px;line-height:1}
+.x:hover{color:var(--red)}
+input,select,textarea{font:inherit;color:inherit;background:transparent}
+a{color:var(--accent)}
+
+/* ---------- top bar ---------- */
+.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:18px;padding:0 18px;height:50px;background:var(--top);color:#fff;box-shadow:0 1px 0 rgba(0,0,0,.15)}
+.brand{font:700 19px var(--cond);letter-spacing:.2px;display:flex;align-items:center;gap:9px;white-space:nowrap}
+.brand i{display:inline-block;width:13px;height:13px;border-radius:3px;background:#C6EFCE;box-shadow:inset 0 0 0 2px #fff}
+.tabs{display:flex;height:100%;overflow-x:auto}
+.tabs button{background:none;border:0;border-radius:0;color:var(--top-ink);font:600 14.5px var(--cond);height:100%;padding:0 12px;border-bottom:3px solid transparent}
+.tabs button:hover{color:#fff}
+.tabs button.on{color:#fff;border-bottom-color:#7FD492}
+.badge{display:inline-block;min-width:19px;padding:0 6px;border-radius:10px;background:#FFC24B;color:#3A2A00;font:700 12px var(--ui);line-height:18px;text-align:center;margin-left:3px}
+.status{font-size:13px;display:flex;align-items:center;gap:8px;cursor:pointer;background:var(--top-chip);padding:5px 10px;border-radius:20px;white-space:nowrap}
+.status .dot{width:8px;height:8px;border-radius:50%;background:#7FD492}
+.status.warn .dot{background:#FFC24B}
+.status.err .dot{background:#FF7B7B}
+.status.busy .dot{background:#9FC3E8}
+.themebtn{margin-left:auto;background:var(--top-chip);border:0;color:#fff;border-radius:20px;padding:5px 10px;font:600 12.5px var(--ui);display:flex;align-items:center;gap:6px}
+.themebtn:hover{background:rgba(255,255,255,.18)}
+.themebtn svg{width:15px;height:15px}
+
+.banner{background:var(--amber-bg);color:var(--amber);padding:9px 22px;display:flex;gap:14px;align-items:center;border-bottom:1px solid var(--amber-line)}
+.banner button{margin-left:auto}
+
+main{padding:18px 22px 70px}
+.bar{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:12px;flex-wrap:wrap}
+.bar h1{font:700 24px var(--cond);margin:0;line-height:1.1}
+.bar p{margin:4px 0 0;color:var(--mute)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.muted{color:var(--mute)}
+.search{border:1px solid var(--line);border-radius:7px;padding:7px 11px;background:var(--surface);min-width:260px}
+.tip{color:var(--mute);font-size:12.5px;margin:8px 2px 0}
+.empty{padding:40px;text-align:center;color:var(--mute)}
+
+/* ---------- grids ---------- */
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:auto;max-height:calc(100vh - 165px);box-shadow:var(--card-shadow)}
+table.grid{border-collapse:separate;border-spacing:0;min-width:100%}
+.grid th{position:sticky;top:0;z-index:3;background:var(--head);font:600 13px var(--cond);letter-spacing:.15px;text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);border-right:1px solid var(--line-2);white-space:nowrap;vertical-align:bottom;color:var(--ink)}
+.grid td{border-bottom:1px solid var(--line-2);border-right:1px solid var(--line-2);padding:0;vertical-align:top;background:var(--surface)}
+.grid tr:hover td{background:var(--hover)}
+.grid input{border:0;background:transparent;padding:6px 8px;width:100%;outline:none;min-width:0;color:var(--ink)}
+.grid input:focus{background:var(--focus);box-shadow:inset 0 0 0 2px var(--accent);border-radius:2px}
+.grid input::placeholder{color:var(--faint)}
+.grid td.n{color:var(--faint);font-size:12px;text-align:right;padding:8px 8px 0;width:34px}
+.grid td.ctrl{width:30px;text-align:center;vertical-align:middle}
+.grid .num{text-align:right;font-variant-numeric:tabular-nums}
+.grid td.txt{padding:6px 8px}
+.sticky1{position:sticky;left:0;z-index:2}
+.sticky2{position:sticky;left:160px;z-index:2;box-shadow:1px 0 0 var(--line)}
+th.sticky1,th.sticky2{z-index:4}
+.w-code{width:160px;min-width:160px;max-width:160px}
+.w-desc{width:230px;min-width:230px}
+.w-qty{width:58px;min-width:58px}
+.hint{font-size:11.5px;color:var(--mute);padding:0 8px 6px;margin-top:-4px;line-height:1.3}
+
+/* ---------- comparison ---------- */
+th.sup{min-width:124px;width:124px;max-width:124px;padding:5px 6px 0 8px}
+th.sup .nm{font-size:13px;line-height:1.2}
+th.sup .nm > span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+th.sup .dup{display:block;font-weight:500;color:var(--mute);font-size:11.5px;overflow:hidden;text-overflow:ellipsis;min-height:14px}
+th.sup .x,th.sup .pq{position:absolute;top:3px;opacity:0;background:var(--head);box-shadow:-4px 0 6px var(--head);transition:opacity .12s}
+th.sup .pq{right:22px} th.sup .x{right:2px;font-size:14px;padding:2px 4px}
+th.sup:hover .x,th.sup:hover .pq,th.sup .x:focus,th.sup .pq:focus{opacity:1}
+.pq{border:0;background:none;color:var(--accent);padding:2px 3px;border-radius:4px;display:inline-flex}
+.pq:hover{background:var(--surface)}
+.pq svg{width:14px;height:14px}
+th.sup input{border:1px solid transparent;border-radius:4px;background:var(--surface-2);font:400 11.5px var(--ui);padding:3px 6px;margin:3px 0 5px;width:100%;color:var(--ink)}
+th.sup input::placeholder{color:var(--faint)}
+th.sup input:focus{border-color:var(--accent);background:var(--surface);outline:none}
+th.add{min-width:128px;width:128px;background:var(--head-2);padding:5px}
+th.add input{border:1px dashed var(--faint);border-radius:5px;background:var(--surface);padding:6px 8px;width:100%;font:500 12.5px var(--ui);color:var(--ink)}
+th.add input:focus{border-style:solid;border-color:var(--accent);outline:none}
+td.addcol{background:var(--surface-2)}
+td.cell{position:relative;width:124px;min-width:124px;max-width:124px}
+td.cell .cw{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;width:100%;min-width:0;overflow:hidden}
+td.cell .m,td.cell .p,td.cell .n{grid-column:1/-1}
+td.cell .m{font-size:11.5px;color:var(--mute);text-align:right;padding:4px 8px 0;line-height:1.25}
+td.cell .p{text-align:right;font-weight:700;font-size:14.5px;font-variant-numeric:tabular-nums;padding:1px 8px 5px;line-height:1.25}
+td.cell .p::placeholder{font-weight:400;font-size:13px}
+td.cell .n{display:none;text-align:right;font-weight:700;font-size:14.5px;font-variant-numeric:tabular-nums;color:var(--accent);padding:0 8px 5px}
+td.cell.neg .n,td.cell.nopen .n{display:block}
+td.cell.neg .p{text-decoration:line-through;font-weight:400;font-size:12px;color:var(--mute);padding-bottom:0}
+td.cell .qw{grid-column:1;grid-row:4;display:none;align-items:center;gap:1px;min-width:0;padding:0 0 5px 7px;font-size:10.5px;color:var(--mute);white-space:nowrap}
+td.cell.hasq .qw,td.cell.qopen .qw{display:flex}
+td.cell .qw input{width:44px;flex:none;padding:1px 3px;text-align:left;font-size:11.5px;font-weight:700;color:var(--ink)}
+td.cell .ord{grid-column:1/-1;grid-row:5;display:none;text-align:right;font-size:11px;font-weight:700;color:var(--alloc-ink);padding:0 8px 5px;white-space:nowrap}
+td.cell.hasord .ord{display:block}
+td.cell.hasord .qw{padding-bottom:1px}
+td.cell.qlow .qw,td.cell.qlow .qw input{color:var(--amber)}
+td.cell.hasord.qlow .qw,td.cell.hasord.qlow .qw input{color:var(--mute)}
+td.cell.low,tr:hover td.cell.low{background:var(--low-bg);box-shadow:inset 3px 0 0 var(--low-bar)}
+td.cell.low .p,td.cell.low.neg .n,td.cell.low .ord{color:var(--low-ink)}
+td.cell.low .m{color:var(--low-ink-2)}
+td.cell.low.neg .p{color:var(--low-ink-2)}
+td.cell.alloc,tr:hover td.cell.alloc{background:var(--alloc-bg);box-shadow:inset 3px 0 0 var(--alloc-bar)}
+td.cell.alloc .p,td.cell.alloc.neg .n{color:var(--alloc-ink)}
+td.cell.negbad .n{color:var(--amber)}
+.nb{position:absolute;left:3px;top:19px;display:none;border:0;background:var(--surface);color:var(--accent);font:600 10px var(--ui);padding:1px 4px;border-radius:4px;box-shadow:0 0 0 1px var(--line);z-index:1}
+.nb.qb{top:3px}
+td.cell.hasp:hover .nb,td.cell.hasp:focus-within .nb{display:block}
+td.cell.neg .nb:not(.qb),td.cell.nopen .nb:not(.qb){display:none!important}
+td.cell.hasq .qb,td.cell.qopen .qb{display:none!important}
+th.best,td.best{border-left:2px solid var(--line)}
+td.res{padding:6px 8px;white-space:nowrap;font-size:13px}
+td.best{font-weight:700;color:var(--low-ink);text-align:right;font-variant-numeric:tabular-nums;font-size:14px}
+td.best:not(:empty),tr:hover td.best:not(:empty){background:var(--low-bg)}
+td.best .sp2{background:var(--alloc-bg);color:var(--alloc-ink);padding:0 3px;border-radius:3px}
+.splitlbl{font-size:10.5px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px}
+.refbar{display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap;vertical-align:middle}
+.refsel{border:1px solid var(--line);border-radius:6px;padding:3px 6px;font:14px var(--ui);color:var(--ink);background:var(--surface)}
+.refsel.unset{color:var(--mute)}
+.prnw{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:6px;background:var(--surface);overflow:hidden}
+.prnw span{padding:3px 7px;background:var(--soft);color:var(--mute);font-size:12.5px;font-weight:600;align-self:stretch;display:flex;align-items:center}
+.prnw input{border:0;padding:3px 8px;width:110px;font:14px var(--ui);outline:none;color:var(--ink)}
+.prnw:focus-within{border-color:var(--accent)}
+.refprev{color:var(--accent);font-weight:600}
+input[type=date]{background:var(--surface);color:var(--ink)}
+
+/* ---------- pending ---------- */
+.pcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:14px}
+.pcard{background:var(--surface);border:1px solid var(--line);border-left:4px solid #FFC24B;border-radius:10px;display:flex;flex-direction:column;box-shadow:var(--card-shadow)}
+.pcard.live{border-left-color:var(--accent)}
+.pcard header{padding:12px 14px 6px}
+.pcard .meta{color:var(--mute);font-size:12.5px;margin-top:2px}
+.pcard table{width:100%;border-collapse:collapse;font-size:13px}
+.pcard td{padding:5px 14px;border-top:1px solid var(--soft);vertical-align:top}
+.pcard td.pr{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pcard td.pr b{color:var(--low-ink)}
+.pcard .wait{color:var(--amber);font-size:12px}
+.pcard .sups{padding:8px 14px;display:flex;gap:5px;flex-wrap:wrap;border-top:1px solid var(--soft)}
+.pcard footer{margin-top:auto;padding:10px 14px;border-top:1px solid var(--soft);display:flex;gap:8px;flex-wrap:wrap}
+.pcard footer button{padding:5px 11px;font-size:13px}
+.pcard footer .danger{margin-left:auto}
+.pcard .refbar{margin-top:6px}
+.pcard .refsel,.pcard .prnw input{font-size:13px}
+
+/* ---------- paste quote ---------- */
+.pqmap{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.pqmap label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--mute);flex:1 1 110px;min-width:0;max-width:170px}
+.pqmap select{border:1px solid var(--line);border-radius:5px;padding:5px;font-size:13px;color:var(--ink);width:100%;background:var(--surface)}
+.pqmap label small{color:var(--ink);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pqprev{border:1px solid var(--line);border-radius:8px;max-height:34vh;overflow:auto}
+.pqprev table{width:100%;border-collapse:collapse;font-size:13px}
+.pqprev th{position:sticky;top:0;background:var(--head);text-align:left;padding:6px 8px;font:600 12.5px var(--cond)}
+.pqprev td{padding:5px 8px;border-top:1px solid var(--soft)}
+.pqprev td.num{text-align:right;font-variant-numeric:tabular-nums}
+.pqprev tr.no td{color:var(--mute)}
+.pqprev .st{font-size:12px;white-space:nowrap}
+.pqprev .ok{color:var(--low-ink)} .pqprev .warn{color:var(--amber)}
+textarea#pqt{width:100%;border:1px dashed var(--faint);border-radius:8px;padding:10px;font:13px var(--ui);resize:vertical;min-height:90px;color:var(--ink);background:var(--surface-2)}
+textarea#pqt:focus{border-style:solid;border-color:var(--accent);outline:none}
+.opts{display:flex;gap:18px;flex-wrap:wrap;align-items:center;font-size:13px;margin:8px 0}
+.opts label{display:flex;gap:6px;align-items:center}
+
+/* ---------- history ---------- */
+.group{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:12px;overflow:hidden;box-shadow:var(--card-shadow)}
+.group header{display:flex;align-items:center;gap:14px;padding:9px 14px;border-bottom:1px solid var(--soft);flex-wrap:wrap}
+.group header h3{margin:0;font:700 17px var(--cond)}
+.group header .actions{margin-left:auto}
+.group header button{padding:5px 10px;font-size:13px}
+.group .body{padding:12px 14px;overflow:auto}
+.insight{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--low-bar);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;gap:28px;flex-wrap:wrap}
+.insight div b{display:block;font:700 20px var(--cond);font-variant-numeric:tabular-nums}
+.insight div span{color:var(--mute);font-size:12.5px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;border-radius:0;padding:7px 12px;color:var(--mute)}
+.seg button.on{background:var(--soft);color:var(--ink)}
+/* email-style tables shown inside the app follow the theme */
+html[data-theme=dark] .eml td{background:var(--surface)!important;color:var(--ink)!important;border-color:var(--line)!important}
+html[data-theme=dark] .eml th{border-color:var(--line)!important}
+html[data-theme=dark] .eml td[style*="C6EFCE"]{background:var(--low-bg)!important;color:var(--low-ink)!important}
+html[data-theme=dark] .eml td[style*="DDEBF7"]{background:var(--alloc-bg)!important;color:var(--alloc-ink)!important}
+html[data-theme=dark] .eml span{color:var(--mute)!important}
+html[data-theme=dark] .eml span[style*="DDEBF7"]{background:var(--alloc-bg)!important;color:var(--alloc-ink)!important}
+html[data-theme=dark] .eml span[style*="C55A11"]{color:var(--amber)!important}
+html[data-theme=dark] .eml span[style*="006100"],html[data-theme=dark] .eml span[style*="2F6B3A"]{color:var(--low-ink)!important}
+html[data-theme=dark] .eml span[style*="1F4E79"]{color:var(--alloc-ink)!important}
+
+/* ---------- vendors ---------- */
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:20px;padding:4px 11px;font:500 13px var(--ui);cursor:pointer}
+.chip.on{background:var(--btn);border-color:var(--btn);color:var(--on-btn)}
+.chip small{opacity:.65;margin-left:3px}
+.tag{display:inline-block;font-size:11.5px;padding:1px 7px;border-radius:10px;background:var(--soft);color:var(--mute)}
+.tag.no{background:var(--red-bg);color:var(--red)}
+a.tel{color:inherit;text-decoration:none}
+a.wa{display:inline-flex;vertical-align:-3px;color:#25A244;padding:2px}
+a.wa svg{width:16px;height:16px}
+.tag.cat{background:var(--cat-bg);color:var(--accent);margin:1px 3px 1px 0}
+.catpick{display:flex;gap:6px;flex-wrap:wrap}
+.catpick .chip{font-size:13px}
+.catpick .chip.on::before{content:'✓ '}
+.catnew{display:flex;gap:6px;margin-top:8px}
+.catnew input{flex:1;border:1px solid var(--line);border-radius:6px;padding:6px 9px;font:14px var(--ui);background:var(--surface);color:var(--ink)}
+
+/* ---------- data page ---------- */
+.panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px;max-width:1150px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;box-shadow:var(--card-shadow)}
+.panel h2{font:700 18px var(--cond);margin:0 0 6px}
+.panel p{margin:0 0 12px;color:var(--mute);line-height:1.45;max-width:62ch}
+.panel .actions{margin-top:6px}
+.panel ol{margin:0;padding-left:20px;line-height:1.6;color:var(--ink)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0 0 12px}
+.kv dt{color:var(--mute)} .kv dd{margin:0;font-weight:600}
+
+/* ---------- autocomplete ---------- */
+.ac{position:fixed;z-index:100;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 10px 28px var(--shadow);max-height:320px;overflow:auto;padding:4px 0;min-width:260px;color:var(--ink)}
+.ac div{padding:6px 11px;cursor:pointer}
+.ac div.on{background:var(--focus)}
+.ac b{font-weight:600}
+.ac small{display:block;color:var(--mute);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px}
+.ac em{font-style:normal;font-size:11px;color:var(--low-ink);background:var(--low-bg);border-radius:8px;padding:0 6px;margin-left:6px}
+
+/* ---------- modal ---------- */
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:60;display:flex;align-items:flex-start;justify-content:center;padding:6vh 16px;overflow:auto}
+.modal{background:var(--surface);color:var(--ink);border-radius:12px;width:min(640px,100%);box-shadow:0 20px 60px var(--shadow);border:1px solid var(--line)}
+.modal.wide{width:min(860px,100%)}
+.modal header{padding:18px 22px 6px}
+.modal header h2{margin:0;font:700 21px var(--cond)}
+.modal header p{margin:4px 0 0;color:var(--mute)}
+.modal .content{padding:12px 22px}
+.modal footer{padding:14px 22px 18px;display:flex;gap:8px;justify-content:flex-end;align-items:center;border-top:1px solid var(--soft);flex-wrap:wrap}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--mute)}
+.form label.full{grid-column:1/-1}
+.form input,.form textarea{border:1px solid var(--line);border-radius:6px;padding:8px 10px;color:var(--ink);font:14px var(--ui);resize:vertical;background:var(--surface)}
+.vlist{border:1px solid var(--line);border-radius:8px;max-height:46vh;overflow:auto}
+.vlist label{display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--soft);cursor:pointer}
+.vlist label:last-child{border-bottom:0}
+.vlist label.off{cursor:default;opacity:.55}
+.vlist small{display:block;color:var(--mute)}
+.welcome .choice{display:grid;gap:10px}
+.welcome .choice button{text-align:left;padding:13px 16px;white-space:normal}
+.welcome .choice button small{display:block;font-weight:400;color:var(--mute);margin-top:2px}
+.welcome .choice button.primary small{color:#D5E3F1}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1B2A3A;color:#fff;padding:10px 18px;border-radius:8px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.3);max-width:90vw}
+html[data-theme=dark] .toast{background:#E2E9F0;color:#0E151C}
+.toast.err,html[data-theme=dark] .toast.err{background:#A61B1B;color:#fff}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px;border:2px solid var(--surface)}
+::-webkit-scrollbar-track{background:transparent}
+@media (prefers-reduced-motion:no-preference){.toast{animation:up .18s ease-out}@keyframes up{from{opacity:0;transform:translate(-50%,8px)}}}
+td.res .rv{display:block}
+.tabs .ts{display:none}
+.mnote{display:none}
+@media (max-width:760px){
+  body{font-size:15px}
+  .top{gap:8px;padding:0 12px;height:48px}
+  .brand{font-size:17px}
+  .status span,.themebtn span{display:none}
+  .tabs{position:fixed;left:0;right:0;bottom:0;height:calc(58px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:var(--top);z-index:40;box-shadow:0 -1px 0 rgba(0,0,0,.25)}
+  .tabs button{flex:1 1 0;min-width:0;padding:0 2px;font:600 11.5px var(--ui);border-bottom:0;border-top:3px solid transparent;position:relative}
+  .tabs button.on{border-top-color:#7FD492}
+  .tabs .tl{display:none} .tabs .ts{display:inline}
+  .tabs .badge{position:absolute;top:5px;right:4px;min-width:16px;line-height:15px;font-size:10px;padding:0 4px;margin:0}
+  main{padding:12px 10px calc(84px + env(safe-area-inset-bottom))}
+  .banner{padding:8px 12px;flex-wrap:wrap;font-size:13.5px;gap:8px}
+  .banner button{margin-left:0}
+  .bar{align-items:stretch;gap:10px}
+  .bar h1{font-size:21px}
+  .bar > .actions{width:100%}
+  .bar > .actions button{flex:1 1 auto;padding:10px}
+  .search{min-width:0;flex:1 1 100%}
+  .tip{display:none}
+  .mnote{display:block;color:var(--mute);font-size:12.5px;margin:0 2px 8px}
+  .refbar{display:flex;margin-top:6px}
+  .refsel{flex:1 1 150px} .prnw{flex:1 1 130px} .prnw input{width:100%}
+  /* tables become cards */
+  .sheet{max-height:none;overflow:visible;background:transparent;border:0;box-shadow:none;border-radius:0}
+  table.grid,table.grid > tbody{display:block;min-width:0;width:100%}
+  table.grid:not([data-scope=cmp]) > thead{display:none}
+  .grid tr{display:block;position:relative;background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden;box-shadow:var(--card-shadow)}
+  .grid tr.blank{border-style:dashed;box-shadow:none}
+  .grid tr:hover td{background:transparent}
+  .grid td{display:flex;align-items:center;flex-wrap:wrap;border:0;border-bottom:1px solid var(--line-2);background:transparent;width:auto!important;min-width:0!important;max-width:none!important}
+  .grid td:last-child,.grid td.ctrl{border-bottom:0}
+  .grid td[data-label]::before{content:attr(data-label);flex:0 0 108px;font-size:12px;color:var(--mute);padding-left:12px}
+  .grid td.txt[data-label]::before{padding-left:0}
+  .grid td > input{flex:1;padding:11px 12px;font-size:15px}
+  .grid td.txt{padding:9px 12px}
+  .grid td.txt.none{display:none}
+  .grid td.n{display:none}
+  .grid td.ctrl{position:absolute;top:2px;right:2px;width:auto;z-index:2;display:block}
+  .grid td.ctrl .x{font-size:20px;padding:8px 10px}
+  .grid td.ctrl .ghost{padding:8px 10px}
+  .grid td.vhead{font-size:16px;padding:12px 90px 10px 12px;background:var(--surface-2)!important}
+  .grid .num{text-align:left}
+  .grid td.empty{display:block}
+  .sticky1,.sticky2{position:static!important;box-shadow:none!important}
+  .hint{width:100%;padding:0 12px 8px 120px;margin-top:-6px}
+  /* comparison: supplier chips + item cards */
+  table[data-scope=cmp] > thead{display:block}
+  table[data-scope=cmp] > thead tr{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;margin:0;background:transparent;border:0;box-shadow:none;border-radius:0}
+  table[data-scope=cmp] > thead th{display:none}
+  table[data-scope=cmp] > thead th.sup,table[data-scope=cmp] > thead th.add{display:block;position:relative;top:auto;flex:0 0 auto;width:auto!important;min-width:140px!important;max-width:200px!important;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:8px 10px 4px}
+  th.sup .nm{display:flex;align-items:flex-start;gap:4px}
+  th.sup .nm > span{flex:1;cursor:pointer}
+  th.sup .x,th.sup .pq{position:static;opacity:1;background:none;box-shadow:none;padding:2px 4px}
+  th.sup .pq svg{width:18px;height:18px} th.sup .x{font-size:18px}
+  th.sup.focus{border-color:var(--accent)!important;box-shadow:inset 0 0 0 2px var(--accent)}
+  th.add{min-width:170px!important}
+  th.add input{padding:10px;font-size:14px}
+  table[data-scope=cmp] > tbody > tr{display:grid;grid-template-columns:minmax(0,1fr) 96px;grid-auto-flow:row dense}
+  table[data-scope=cmp] td{grid-column:1/-1}
+  table[data-scope=cmp] td.sticky1{grid-column:1}
+  table[data-scope=cmp] td.w-qty{grid-column:2;border-left:1px solid var(--line-2);padding-right:34px}
+  table[data-scope=cmp] td.ctrl{top:4px}
+  .status{padding:5px 8px;gap:0}
+  table[data-scope=cmp] td.w-qty::before{flex:0 0 auto;padding-left:10px}
+  table[data-scope=cmp] td.sticky1::before{flex-basis:auto;padding-right:4px}
+  table[data-scope=cmp] td.addcol{display:none}
+  table[data-scope=cmp] tr.blank td.cell,table[data-scope=cmp] tr.blank td.res,table[data-scope=cmp] tr.blank td.w-desc,table[data-scope=cmp] tr.blank td.w-qty{display:none}
+  table[data-scope=cmp] tr.blank{grid-template-columns:1fr}
+  td.cell{display:grid!important;grid-template-columns:minmax(0,1fr) 170px;min-height:58px;align-items:start}
+  td.cell::before{grid-column:1;padding:10px 0 0 12px!important;font-size:14px!important;font-weight:600;color:var(--ink)!important}
+  td.cell .cw{grid-column:2}
+  td.cell .m{padding-top:8px;font-size:12.5px} td.cell .p,td.cell .n{font-size:17px}
+  td.cell .qw{font-size:12px} td.cell .qw input{width:52px;font-size:13px} td.cell .ord{font-size:12px}
+  .nb{top:auto!important;bottom:8px;left:12px;font-size:11.5px;padding:4px 9px}
+  .nb.qb{left:64px}
+  td.cell.hasp .nb{display:block}
+  td.cell.low,td.cell.alloc{box-shadow:inset 4px 0 0 var(--low-bar)}
+  td.cell.alloc{box-shadow:inset 4px 0 0 var(--alloc-bar)}
+  td.res{padding:8px 12px;white-space:normal;align-items:flex-start}
+  td.res::before{padding-left:0!important}
+  td.best{justify-content:flex-start;text-align:left;border-left:0}
+  td.best .rv{text-align:left}
+  /* other pages */
+  .pcards{grid-template-columns:1fr}
+  .pcard td.pr{white-space:normal;text-align:right;min-width:120px}
+  main{overflow-x:clip;max-width:100vw}
+  .pcard,.group,.panel,.insight{min-width:0;max-width:100%}
+  .panels{grid-template-columns:1fr}
+  .group header{padding:10px 12px}
+  .group header .actions{margin-left:0;width:100%}
+  .group .body{padding:10px}
+  .insight{gap:16px}
+  .chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}
+  .chip{flex:0 0 auto}
+  .scrim{padding:0}
+  .modal,.modal.wide{width:100%;min-height:100%;border-radius:0;border:0}
+  .form{grid-template-columns:1fr}
+  .pqmap label{max-width:none;flex-basis:45%}
+  .toast{bottom:calc(72px + env(safe-area-inset-bottom))}
+}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="brand"><i></i>Price Desk</div>
+  <nav class="tabs" id="tabs"></nav>
+  <button class="themebtn" id="themeBtn" title="Theme"></button>
+  <div class="status" id="status" title="Data storage"><span class="dot"></span><span id="statusText">Loading…</span></div>
+</div>
+<div id="banner"></div>
+<main id="view"></main>
+<div id="ac" class="ac" hidden></div>
+<input type="file" id="filePick" hidden>
+
+<script>
+'use strict';
+const SEED = {};
+const APP = 'PriceDesk';
+const XLSX_URL = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+
+/* ---------- helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-4);
+const today = () => { const d = new Date(); return new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); };
+const num = v => { if (v === null || v === undefined) return NaN; const s = String(v).replace(/,/g, '').trim(); if (s === '') return NaN; const n = Number(s); return isFinite(n) ? n : NaN; };
+const fmtQty = n => isNaN(n) ? '' : String(+n.toFixed(2));
+const money = n => isNaN(n) ? '' : n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const fmtDate = iso => { if (!iso) return ''; const [y, m, d] = String(iso).slice(0, 10).split('-'); return `${+d} ${MON[+m - 1] || ''} ${y}`; };
+const norm = s => String(s ?? '').toLowerCase().replace(/[\s\-_.\/,()&+]/g, '');
+const plural = (n, w) => `${n} ${n === 1 ? w : /[^aeiou]y$/.test(w) ? w.slice(0, -1) + 'ies' : /(s|sh|ch|x)$/.test(w) ? w + 'es' : w + 's'}`;
+
+function toast(msg, err) {
+  $$('.toast').forEach(x => x.remove());
+  const t = document.createElement('div'); t.className = 'toast' + (err ? ' err' : ''); t.textContent = msg;
+  document.body.appendChild(t); setTimeout(() => t.remove(), err ? 5000 : 3000);
+}
+function download(name, text, type = 'application/json') {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+function pickFile(accept) {
+  return new Promise(res => {
+    const inp = $('#filePick'); inp.value = ''; inp.accept = accept;
+    inp.onchange = () => res(inp.files[0] || null); inp.click();
+  });
+}
+function loadScript(src) {
+  return new Promise((res, rej) => { if (window.XLSX) return res(); const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('load')); document.head.appendChild(s); });
+}
+function rank(list, fields, q) {
+  const words = String(q || '').toLowerCase().split(/\s+/).map(norm).filter(Boolean);
+  if (!words.length) return list.slice();
+  const n = words.join(''), out = [];
+  for (const x of list) {
+    const fs = fields(x).map(norm), all = fs.join(' ');
+    if (!words.every(w => all.includes(w))) continue;
+    let s = 3; if (fs[0].startsWith(n)) s = 0; else if (fs.some(f => f.startsWith(n))) s = 1; else if (fs[0].includes(n)) s = 2;
+    out.push([s, x]);
+  }
+  return out.sort((a, b) => a[0] - b[0]).map(a => a[1]);
+}
+function shortFromName(name) {
+  return String(name || '').trim().replace(/\s+(Auto Spare Parts|Auto Parts|Spare Parts|Trading Company|General Trading|Trading|L\.?L\.?C\.?)$/i, '').trim() || String(name || '').trim();
+}
+
+/* ---------- state ---------- */
+let S = null;
+function blankCmp() { return { inq: null, date: today(), ref: '', branch: '', prn: '', rows: [], sups: [], cells: {} }; }
+const DEFAULT_BRANCHES = ['Khalifa Rent a Car', 'Cariva Auto Center'];
+const DEFAULT_CATS = ['Genuine Parts', 'Aftermarket Parts', 'Battery', 'AC Parts', 'Tyres'];
+/* old "Specialty" text mixed part categories with vehicle makes: "Multibrand-Genuine/Aftermarket", "Aftermarket-Batteries", "Hyundai/Kia" */
+function splitSpecialty(text, name, known) {
+  const cats = [], makes = [];
+  const add = c => { if (!cats.includes(c)) cats.push(c); };
+  String(text || '').split(/[\/,;&]|\s*-\s*/).map(t => t.trim()).filter(Boolean).forEach(t => {
+    if (/genuine/i.test(t)) add('Genuine Parts');
+    else if (/after\s*market/i.test(t)) add('Aftermarket Parts');
+    else if (/batter/i.test(t)) add('Battery');
+    else if (/^a\.?\/?c\b/i.test(t)) add('AC Parts');
+    else if (/tyre|tire/i.test(t)) add('Tyres');
+    else { const k = (known || []).find(c => norm(c) === norm(t)); if (k) add(k); else makes.push(t.replace(/^chevorlet$/i, 'Chevrolet')); }
+  });
+  if (/tyre|tire/i.test(name || '')) add('Tyres');
+  if (/batter/i.test(name || '')) add('Battery');
+  return { cats, brands: makes.join(', ') };
+}
+const catLine = v => (v.cats || []).join(', ');
+const waNum = p => { let d = String(p || '').replace(/\D/g, ''); if (/^0\d{8,9}$/.test(d)) d = '971' + d.slice(1); return d.length >= 9 ? d : ''; };
+const WA_ICON = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.2a6.7 6.7 0 0 0-5.8 10.1L1.3 14.8l3.6-.9A6.7 6.7 0 1 0 8 1.2zm0 12.2c-1 0-2-.3-2.9-.8l-.2-.1-2.1.6.6-2.1-.1-.2A5.5 5.5 0 1 1 8 13.4zm3-4.1c-.2-.1-1-.5-1.1-.5-.2-.1-.3-.1-.4.1l-.5.6c-.1.1-.2.1-.4 0a4.5 4.5 0 0 1-2.2-1.9c-.2-.3.2-.3.5-1 .1-.1 0-.2 0-.3l-.5-1.2c-.1-.3-.3-.3-.4-.3h-.3a.6.6 0 0 0-.5.2 1.9 1.9 0 0 0-.6 1.4 3.3 3.3 0 0 0 .7 1.8 7.6 7.6 0 0 0 2.9 2.6c1.1.5 1.5.5 2 .4.3 0 1-.4 1.1-.8.1-.4.1-.7.1-.8l-.4-.1z"/></svg>';
+const phoneLinks = p => { if (!p) return ''; const w = waNum(p); return `<a href="tel:${esc(String(p).replace(/[^\d+]/g, ''))}" class="tel">${esc(p)}</a>${w ? ` <a class="wa" href="https://wa.me/${w}" target="_blank" rel="noopener" title="WhatsApp ${esc(p)}">${WA_ICON}</a>` : ''}`; };
+const cleanPrn = v => String(v || '').replace(/^\s*prn[\s:#.\-]*/i, '').trim();
+/* "Cariva Auto Center - PRN 008758", or the branch alone, or "PRN 008758" alone; older free-text references are kept as they were */
+function fmtRef(o) {
+  const b = String((o && o.branch) || '').trim(), p = cleanPrn(o && o.prn);
+  if (b || p) return [b, p ? 'PRN ' + p : ''].filter(Boolean).join(' - ');
+  return String((o && o.ref) || '').trim();
+}
+function branchSelect(f, val, extra = '') {
+  const list = S.branches.slice(); if (val && !list.includes(val)) list.push(val);
+  return `<select data-f="${f}" ${extra} aria-label="Branch" class="refsel${val ? '' : ' unset'}"><option value="">Select branch…</option>${list.map(b => `<option ${b === val ? 'selected' : ''}>${esc(b)}</option>`).join('')}</select>`;
+}
+const prnInput = (f, val, extra = '') => `<span class="prnw"><span>PRN</span><input data-f="${f}" ${extra} value="${esc(cleanPrn(val))}" placeholder="number" aria-label="PRN number" inputmode="numeric"></span>`;
+function normalize(d) {
+  d = d && typeof d === 'object' ? d : {};
+  const rfq = d.rfq || {}, c = d.cmp;
+  const o = {
+    app: APP, version: 1,
+    vendors: (d.vendors || []).map(v => { const sp = Array.isArray(v.cats) ? { cats: v.cats.map(String).filter(Boolean), brands: v.brands || '' } : splitSpecialty(v.brands, v.name, d.categories); return { id: v.id || uid(), name: v.name || v.short || '', short: v.short || shortFromName(v.name), contact: v.contact || '', phone: v.phone || '', email: v.email || '', cats: sp.cats, brands: sp.brands }; }).filter(v => v.short),
+    items: (d.items || []).map(i => ({ code: String(i.code ?? '').trim(), desc: i.desc || '', brand: i.brand || '' })).filter(i => i.code),
+    history: (d.history || []).map(h => ({ id: h.id || uid(), date: h.date || today(), inq: +h.inq || 0, code: String(h.code ?? ''), desc: h.desc || '', supplier: h.supplier || '', model: h.model || '', price: num(h.price), qty: h.qty ?? '', final: isNaN(num(h.final)) ? null : num(h.final), avail: isNaN(num(h.avail)) ? null : num(h.avail), ref: h.ref || '', branch: h.branch || '', prn: h.prn || '' })).filter(h => !isNaN(h.price)),
+    branches: Array.isArray(d.branches) && d.branches.length ? d.branches.map(String).filter(Boolean) : DEFAULT_BRANCHES.slice(),
+    rfq: { branch: rfq.branch || '', prn: rfq.prn || '', rows: (rfq.rows || []).map(r => ({ id: r.id || uid(), brand: r.brand || '', type: r.type || '', code: String(r.code ?? ''), desc: r.desc || '', qty: r.qty ?? '' })), subject: rfq.subject || 'Request for Quotation', sentTo: rfq.sentTo || [],
+      intro: rfq.intro ?? 'Dear Sir/Madam,\n\nKindly quote your best price and availability for the items below.', signoff: rfq.signoff ?? 'Best regards,' },
+    cmp: normCmp(c),
+    pending: (d.pending || []).map(p => ({ id: p.id || uid(), created: p.created || new Date().toISOString(), updated: p.updated || p.created || new Date().toISOString(), cmp: normCmp(p.cmp) })).filter(p => cmpHasData(p.cmp)),
+    meta: { savedAt: (d.meta && d.meta.savedAt) || null }
+  };
+  o.categories = (Array.isArray(d.categories) && d.categories.length ? d.categories.map(String).filter(Boolean) : DEFAULT_CATS.slice());
+  o.vendors.forEach(v => v.cats.forEach(c => { if (!o.categories.some(x => norm(x) === norm(c))) o.categories.push(c); }));
+  return o;
+}
+function normCmp(c) {
+  if (!c || !Array.isArray(c.rows)) return blankCmp();
+  const o = { inq: c.inq || null, date: c.date || today(), ref: c.ref || '', branch: c.branch || '', prn: c.prn || '', pendingId: c.pendingId || null, created: c.created || null,
+    rows: c.rows.map(r => ({ id: r.id || uid(), code: r.code || '', desc: r.desc || '', qty: r.qty ?? '', final: r.final })),
+    sups: (c.sups || []).map(s => ({ id: s.id || uid(), name: s.name || '', model: s.model || '' })), cells: c.cells || {} };
+  /* earlier drafts kept one final price per item: move it onto the best supplier's cell as a negotiated price */
+  o.rows.forEach(r => {
+    const f = num(r.final); delete r.final; if (isNaN(f)) return;
+    let bk = null, bp = Infinity; o.sups.forEach(sp => { const k = r.id + '|' + sp.id, p = num((o.cells[k] || {}).p); if (!isNaN(p) && p < bp) { bp = p; bk = k; } });
+    if (bk) o.cells[bk].n = String(f);
+  });
+  return o;
+}
+const cmpHasData = C => C.rows.some(r => r.code || r.desc || String(r.qty ?? '').trim()) || C.sups.length > 0;
+/* run comparison helpers against a draft that is not the open comparison */
+function withCmp(C, fn) { const keep = S.cmp; S.cmp = C; try { return fn(); } finally { S.cmp = keep; } }
+const vendorByShort = name => S.vendors.find(v => norm(v.short) === norm(name)) || S.vendors.find(v => norm(v.name) === norm(name));
+const itemByCode = code => S.items.find(i => norm(i.code) === norm(code));
+function upsertItem(code, desc, brand) {
+  code = String(code || '').trim(); if (!code) return;
+  const it = itemByCode(code);
+  if (it) { if (desc) it.desc = desc; if (brand) it.brand = brand; }
+  else S.items.push({ code, desc: desc || '', brand: brand || '' });
+}
+const hasNeg = h => h.final !== null && h.final !== undefined && !isNaN(h.final);
+const effP = h => hasNeg(h) ? h.final : h.price;
+const nextInq = () => S.history.reduce((m, h) => Math.max(m, h.inq), 0) + 1;
+function lastQuote(code) {
+  const rows = S.history.filter(h => norm(h.code) === norm(code)); if (!rows.length) return null;
+  const key = h => h.date + '|' + String(h.inq).padStart(6, '0');
+  const lastKey = rows.map(key).sort().pop();
+  const last = rows.filter(h => key(h) === lastKey).sort((a, b) => effP(a) - effP(b))[0];
+  return last;
+}
+
+/* ---------- storage: IndexedDB cache + JSON data file ---------- */
+let handle = null, storage = 'none', saveTimer = null, pending = false;
+const fsOK = 'showSaveFilePicker' in window;
+/* phone mode: no file access on Android, so data lives in the phone's storage and moves by file handoff */
+const PHONE = !fsOK || /Android|iPhone|iPad|Mobi/i.test(navigator.userAgent);
+const LS = { get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+const phoneSync = () => LS.get('pd-phone') || {};
+const phoneUnsent = () => PHONE && !!S.meta.savedAt && S.meta.savedAt > (phoneSync().synced || '') && (S.vendors.length || S.history.length || cmpHasData(S.cmp) || S.pending.length);
+const pcAway = () => PHONE ? null : LS.get('pd-away');
+const stamp = () => { const d = new Date(); return `${today()}-${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}`; };
+const counts = d => `${plural(d.vendors.length, 'vendor')}, ${plural(d.history.length, 'history price')}, ${plural(d.pending.length, 'pending draft')}`;
+function idb(mode, fn) {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('pricedesk', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('kv');
+    r.onerror = () => rej(r.error);
+    r.onsuccess = () => { const db = r.result, tx = db.transaction('kv', mode), q = fn(tx.objectStore('kv')); tx.oncomplete = () => { db.close(); res(q && q.result); }; tx.onerror = () => rej(tx.error); };
+  });
+}
+const idbGet = k => idb('readonly', st => st.get(k)).catch(() => null);
+const idbSet = (k, v) => idb('readwrite', st => st.put(v, k)).catch(() => null);
+const idbDel = k => idb('readwrite', st => st.delete(k)).catch(() => null);
+const snapshot = () => JSON.parse(JSON.stringify(S));
+
+function touch() { pending = true; setStatus(); clearTimeout(saveTimer); saveTimer = setTimeout(persist, 500); }
+async function persist() {
+  clearTimeout(saveTimer);
+  S.meta.savedAt = new Date().toISOString();
+  await idbSet('cache', snapshot());
+  if (handle && storage === 'file') {
+    try { const w = await handle.createWritable(); await w.write(JSON.stringify(S, null, 1)); await w.close(); pending = false; }
+    catch (e) { storage = 'needs-permission'; renderBanner(); }
+  } else pending = false;
+  if (PHONE || pcAway()) renderBanner(); else setStatus();
+}
+async function readHandle(h) { const f = await h.getFile(); const t = await f.text(); return t.trim() ? JSON.parse(t) : {}; }
+function validData(d) { return d && typeof d === 'object' && (d.app === APP || Array.isArray(d.vendors) || Array.isArray(d.history)); }
+
+async function boot() {
+  const cache = await idbGet('cache');
+  if (PHONE) {
+    S = normalize(cache || SEED); storage = 'phone'; renderAll();
+    try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
+    if (!cache) showPhoneWelcome();
+    return;
+  }
+  handle = fsOK ? await idbGet('handle') : null;
+  if (handle) {
+    let perm = 'prompt'; try { perm = await handle.queryPermission({ mode: 'readwrite' }); } catch (e) {}
+    if (perm === 'granted') {
+      try { S = normalize(await readHandle(handle)); storage = 'file'; await mergeNewerCache(cache); }
+      catch (e) { S = normalize(cache || SEED); storage = 'needs-permission'; }
+    } else { S = normalize(cache || SEED); storage = 'needs-permission'; }
+  } else if (cache) { S = normalize(cache); storage = 'browser'; }
+  else { S = normalize(SEED); storage = 'none'; }
+  renderAll();
+  if (storage === 'none') showWelcome();
+}
+async function mergeNewerCache(cache) {
+  if (!cache || !cache.meta || !cache.meta.savedAt) return;
+  if (!S.meta.savedAt || cache.meta.savedAt > S.meta.savedAt) {
+    if (confirm('This browser has changes that are newer than your data file (made while the file was disconnected).\n\nOK = keep the newer changes and write them to the file\nCancel = use the data file as it is')) {
+      S = normalize(cache); await persist();
+    }
+  }
+}
+async function reconnect() {
+  if (!handle) return showWelcome();
+  try {
+    const p = await handle.requestPermission({ mode: 'readwrite' });
+    if (p !== 'granted') return toast('Permission was not granted. Your changes stay in this browser until you reconnect.', true);
+    const cache = snapshot(); S = normalize(await readHandle(handle)); storage = 'file';
+    await mergeNewerCache(cache); renderAll(); toast('Connected to ' + handle.name);
+  } catch (e) { toast('Could not open the data file: ' + e.message, true); }
+}
+async function createDataFile(data) {
+  try {
+    const h = await window.showSaveFilePicker({ suggestedName: 'PriceDesk-data.json', types: [{ description: 'Price Desk data', accept: { 'application/json': ['.json'] } }] });
+    handle = h; await idbSet('handle', h); if (data) S = normalize(data); storage = 'file';
+    await persist(); closeModal(); renderAll(); toast('Data file created: ' + h.name);
+  } catch (e) { if (e.name !== 'AbortError') toast('Could not create the file: ' + e.message, true); }
+}
+async function openDataFile() {
+  try {
+    const [h] = await window.showOpenFilePicker({ types: [{ description: 'Price Desk data', accept: { 'application/json': ['.json'] } }] });
+    const d = await readHandle(h);
+    if (!validData(d)) return toast('That file is not a Price Desk data file.', true);
+    handle = h; await idbSet('handle', h); S = normalize(d); storage = 'file';
+    await idbSet('cache', snapshot()); closeModal(); renderAll(); toast('Opened ' + h.name);
+  } catch (e) { if (e.name !== 'AbortError') toast('Could not open the file: ' + e.message, true); }
+}
+function useBrowserOnly() { storage = 'browser'; persist(); closeModal(); renderAll(); }
+
+function backupNow() {
+  S.meta.savedAt = S.meta.savedAt || new Date().toISOString();
+  const d = snapshot(); d.backupAt = new Date().toISOString();
+  download(`PriceDesk-backup-${today()}.json`, JSON.stringify(d, null, 1));
+  toast('Backup downloaded');
+}
+async function restoreBackup() {
+  const f = await pickFile('.json,application/json'); if (!f) return;
+  let d; try { d = JSON.parse(await f.text()); } catch (e) { return toast('That file is not valid JSON.', true); }
+  if (!validData(d)) return toast('That file is not a Price Desk backup.', true);
+  const n = normalize(d);
+  if (!confirm(`Restore this backup?\n\n${plural(n.vendors.length, 'vendor')}, ${plural(n.items.length, 'item')}, ${plural(n.history.length, 'history row')}.\n\nIt replaces everything currently in Price Desk.`)) return;
+  S = n;
+  if (storage === 'file' && handle) { await persist(); renderAll(); toast('Backup restored to ' + handle.name); }
+  else if (fsOK) {
+    await idbSet('cache', snapshot()); renderAll();
+    openModal(`<header><h2>Backup restored</h2><p>Now choose where to keep your data file on this computer, so every change is saved to it.</p></header>
+      <footer><button data-m="later">Later</button><button class="primary" data-m="create">Choose where to save the data file</button></footer>`,
+      m => { m.querySelector('[data-m=create]').onclick = () => createDataFile(); m.querySelector('[data-m=later]').onclick = () => useBrowserOnly(); });
+  } else { storage = 'browser'; await persist(); renderAll(); toast('Backup restored'); }
+}
+
+/* ---------- weekend handoff: PC → phone → PC ---------- */
+async function sendToPhone() {
+  await persist();
+  const at = new Date().toISOString(), d = snapshot(); d.meta.toPhoneAt = at;
+  download(`PriceDesk-to-phone-${stamp()}.json`, JSON.stringify(d, null, 1));
+  LS.set('pd-away', { at, base: S.meta.savedAt }); renderBanner(); if (tab === 'data') renderView();
+  toast('File saved. Send it to your phone on WhatsApp, then in Price Desk on the phone tap “Load from PC file”.');
+}
+async function readJsonFile(accept) {
+  const f = await pickFile(accept || '.json,application/json'); if (!f) return null;
+  let d; try { d = JSON.parse(await f.text()); } catch (e) { toast('That file is not a valid Price Desk file.', true); return null; }
+  if (!validData(d)) { toast('That file is not a Price Desk data file.', true); return null; }
+  return d;
+}
+async function loadPhoneFile() {
+  const d = await readJsonFile(); if (!d) return;
+  const n = normalize(d), away = pcAway(), notes = [];
+  if (!d.meta || !d.meta.toPcAt) notes.push('This file was not made with “Send to PC” on the phone — it may be an ordinary backup.');
+  if (away && S.meta.savedAt && S.meta.savedAt > away.base) notes.push(`You changed data on this PC after sending it to the phone (last change ${fmtWhen(S.meta.savedAt)}). Those PC changes will be replaced.`);
+  if (!away) notes.push('This PC has no record of sending data to the phone.');
+  if (!away && n.meta.savedAt && S.meta.savedAt && n.meta.savedAt < S.meta.savedAt) notes.push('The phone file is OLDER than the data on this PC.');
+  const when = n.meta.savedAt ? ` (last saved on the phone ${fmtWhen(n.meta.savedAt)})` : '';
+  if (!confirm(`Load the phone file?\n\nPhone file: ${counts(n)}${when}\nThis PC now: ${counts(S)}\n\n${notes.length ? notes.join('\n\n') + '\n\n' : ''}A backup of the current PC data is downloaded first, just in case.`)) return;
+  download(`PriceDesk-before-phone-load-${stamp()}.json`, JSON.stringify(snapshot(), null, 1));
+  S = n; LS.set('pd-away', null); await persist(); renderAll();
+  toast(`Phone data loaded: ${counts(S)}.`);
+}
+async function loadFromPC() {
+  const d = await readJsonFile('.json,application/json,text/plain'); if (!d) return;
+  const n = normalize(d), notes = [];
+  if (phoneUnsent()) notes.push('This phone has changes that were never sent to the PC. They will be replaced.');
+  if (n.meta.savedAt && S.meta.savedAt && n.meta.savedAt < S.meta.savedAt && S.vendors.length) notes.push(`This file (${fmtWhen(n.meta.savedAt)}) is OLDER than the data on this phone (${fmtWhen(S.meta.savedAt)}).`);
+  if (S.vendors.length || S.history.length) { if (!confirm(`Load this file from the PC?\n\nFile: ${counts(n)}\nThis phone now: ${counts(S)}\n\n${notes.join('\n\n')}`)) return; }
+  S = n; S.meta.savedAt = S.meta.savedAt || new Date().toISOString();
+  await idbSet('cache', snapshot());
+  LS.set('pd-phone', Object.assign(phoneSync(), { synced: S.meta.savedAt, loadedAt: new Date().toISOString() }));
+  closeModal(); renderAll(); toast(`Loaded from PC: ${counts(S)}.`);
+}
+async function sendToPC() {
+  if (!S.vendors.length && !S.history.length && !S.pending.length) return toast('There is no data on this phone yet.', true);
+  S.meta.toPcAt = new Date().toISOString(); await persist();
+  const json = JSON.stringify(snapshot(), null, 1), name = `PriceDesk-from-phone-${stamp()}.json`;
+  const mark = () => { LS.set('pd-phone', Object.assign(phoneSync(), { synced: S.meta.savedAt, sentAt: new Date().toISOString() })); renderBanner(); if (tab === 'data') renderView(); };
+  let file = null; try { file = new File([json], name, { type: 'application/json' }); } catch (e) {}
+  if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: 'Price Desk data' }); mark(); toast('Sent. On the PC: Data & backup → Load phone file.'); return; }
+    catch (e) { if (e.name === 'AbortError') return; }
+  }
+  download(name, json); mark(); toast('File saved to Downloads. Send it to the PC on WhatsApp.');
+}
+function showPhoneWelcome() {
+  openModal(`<div class="welcome"><header><h2>Price Desk on your phone</h2>
+    <p>Load the file you sent from the PC. Everything you change here is saved on this phone; on Monday tap “Send to PC”.</p></header>
+    <div class="content choice">
+      <button class="primary" data-m="load">Load from PC file<small>Pick the PriceDesk-to-phone file you received on WhatsApp.</small></button>
+      <button data-m="empty">Start without data<small>You can load the file later from Data &amp; backup.</small></button>
+    </div></div>`, m => {
+    m.querySelector('[data-m=load]').onclick = loadFromPC;
+    m.querySelector('[data-m=empty]').onclick = () => { closeModal(); renderAll(); };
+  }, true);
+}
+function showWelcome() {
+  const noFs = !fsOK ? `<p style="color:var(--amber);margin-top:10px">This browser can't save to a file on your drive. Open Price Desk in Google Chrome or Microsoft Edge to use a data file.</p>` : '';
+  openModal(`<div class="welcome"><header><h2>Set up your data file</h2>
+    <p>Price Desk keeps everything in one .json file on your drive and saves to it automatically as you work.</p>${noFs}</header>
+    <div class="content choice">
+      <button class="primary" data-m="create" ${fsOK ? '' : 'disabled'}>Create a new data file<small>Starts with your current vendor list (${S.vendors.length}) and price history (${S.history.length} prices) from the Excel workbook.</small></button>
+      <button data-m="open" ${fsOK ? '' : 'disabled'}>Open an existing data file<small>Pick a PriceDesk-data.json you already have.</small></button>
+      <button data-m="restore">Restore from a backup<small>Moving to a new computer? Pick your backup file.</small></button>
+    </div>
+    <footer><button class="ghost" data-m="browser">Use without a file for now</button></footer></div>`, m => {
+    m.querySelector('[data-m=create]').onclick = () => createDataFile();
+    m.querySelector('[data-m=open]').onclick = openDataFile;
+    m.querySelector('[data-m=restore]').onclick = () => { closeModal(); restoreBackup(); };
+    m.querySelector('[data-m=browser]').onclick = useBrowserOnly;
+  }, true);
+}
+
+function setStatus() {
+  const el = $('#status'), t = $('#statusText'); el.className = 'status';
+  if (pending) { el.classList.add('busy'); t.textContent = 'Saving…'; return; }
+  if (storage === 'phone') { if (phoneUnsent()) { el.classList.add('warn'); t.textContent = 'Not sent to PC'; } else t.textContent = 'Saved on phone'; return; }
+  if (storage === 'file') t.textContent = 'Saved to ' + (handle ? handle.name : 'data file');
+  else if (storage === 'needs-permission') { el.classList.add('warn'); t.textContent = 'Data file disconnected'; }
+  else if (storage === 'browser') { el.classList.add('warn'); t.textContent = 'Browser only — no data file'; }
+  else { el.classList.add('warn'); t.textContent = 'Not set up'; }
+}
+function renderBanner() {
+  const b = $('#banner');
+  const away = pcAway();
+  if (storage === 'phone') b.innerHTML = phoneUnsent() ? `<div class="banner">This phone has changes that aren't on the PC yet.<button class="primary" data-act="ph-send">Send to PC</button></div>` : '';
+  else if (away && storage !== 'needs-permission') {
+    const changed = S.meta.savedAt && S.meta.savedAt > away.base;
+    b.innerHTML = `<div class="banner">${changed ? `<b>Your data is on the phone since ${esc(fmtWhen(away.at))}, and you've changed data here since.</b>&nbsp;Those PC changes will be replaced when you load the phone file.` : `Your data is on the phone since ${esc(fmtWhen(away.at))}. Load the phone file here when you're back.`}
+      <button class="primary" data-act="pc-load-phone">Load phone file</button><button class="ghost" data-act="pc-away-clear" style="margin-left:0">Not using the phone</button></div>`;
+  }
+  else if (storage === 'needs-permission') b.innerHTML = `<div class="banner">Your data file needs permission again. Changes are kept in this browser until you reconnect.<button class="primary" data-act="reconnect">Reconnect ${esc(handle ? handle.name : 'data file')}</button></div>`;
+  else if (storage === 'browser') b.innerHTML = `<div class="banner">Changes are only stored in this browser. Connect a data file so nothing is lost if browser data is cleared.<button data-act="goto-data">Set up data file</button></div>`;
+  else b.innerHTML = '';
+  setStatus();
+}
+
+/* ---------- modal ---------- */
+let modalLocked = false;
+function openModal(html, mount, locked, wide) {
+  closeModal(); modalLocked = !!locked;
+  const sc = document.createElement('div'); sc.className = 'scrim'; sc.id = 'scrim';
+  sc.innerHTML = `<div class="modal${wide ? ' wide' : ''}" role="dialog" aria-modal="true">${html}</div>`;
+  sc.addEventListener('mousedown', e => { if (e.target === sc && !modalLocked) closeModal(); });
+  document.body.appendChild(sc); mount && mount(sc.firstElementChild);
+  const f = sc.querySelector('input,button.primary'); f && f.focus();
+}
+function closeModal() { const s = $('#scrim'); s && s.remove(); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#scrim') && !modalLocked && $('#ac').hidden) closeModal(); });
+
+/* ---------- clipboard & email tables ---------- */
+const CSS_T = 'border-collapse:collapse;font-family:Calibri,Arial,sans-serif;font-size:11pt;';
+const CSS_TH = 'background:#1F4E79;color:#ffffff;font-weight:bold;padding:6px 10px;border:1px solid #BFBFBF;text-align:center;white-space:nowrap;';
+const CSS_TD = 'padding:5px 10px;border:1px solid #BFBFBF;vertical-align:middle;';
+/* split the requirement when the cheapest supplier can't cover it:
+   cheapest first, up to each supplier's available qty; no qty entered = can supply the rest */
+function allocate(need, offers) {
+  if (isNaN(need) || need <= 0) return null;
+  const list = offers.filter(o => !isNaN(o.p)).sort((a, b) => a.p - b.p || (isNaN(b.q) ? Infinity : b.q) - (isNaN(a.q) ? Infinity : a.q));
+  if (!list.length || isNaN(list[0].q) || list[0].q >= need) return null;
+  let rem = need; const parts = [];
+  for (const o of list) { if (rem <= 0) break; const take = isNaN(o.q) ? rem : Math.min(o.q, rem); if (take > 0) { parts.push({ i: o.i, p: o.p, qty: take }); rem -= take; } }
+  return { parts, short: rem > 0 ? rem : 0 };
+}
+const strike = o => `<span style="font-size:9pt;font-weight:normal;color:#7F7F7F;text-decoration:line-through">${money(o)}</span><br>`;
+const hasO = c => c && c.o !== undefined && !isNaN(c.o);
+const CSS_ALLOC = 'background:#DDEBF7;color:#1F4E79;font-weight:bold;';
+const CSS_LOW = 'background:#C6EFCE;color:#006100;font-weight:bold;';
+async function copyRich(html, text) {
+  try {
+    await navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }), 'text/plain': new Blob([text], { type: 'text/plain' }) })]);
+    return true;
+  } catch (e) {
+    const d = document.createElement('div'); d.contentEditable = 'true'; d.style.cssText = 'position:fixed;left:-9999px;top:0';
+    d.innerHTML = html; document.body.appendChild(d);
+    const r = document.createRange(); r.selectNodeContents(d); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    let ok = false; try { ok = document.execCommand('copy'); } catch (e2) {}
+    sel.removeAllRanges(); d.remove(); return ok;
+  }
+}
+function tableHTML(head, rows) {
+  const th = head.map(h => `<th style="${CSS_TH}">${esc(h)}</th>`).join('');
+  const tr = rows.map(r => `<tr>${r.map(c => `<td style="${CSS_TD}${c.style || ''}">${c.html ?? esc(c.t)}</td>`).join('')}</tr>`).join('');
+  return `<table style="${CSS_T}" cellspacing="0" cellpadding="0"><thead><tr>${th}</tr></thead><tbody>${tr}</tbody></table>`;
+}
+/* grid = {rows:[{code,desc,qty,cells:[{p,m}]}], sups:[names]} */
+function gridBest(r) { const ps = r.cells.map(c => c.p).filter(p => !isNaN(p)); return ps.length ? Math.min(...ps) : NaN; }
+function gridToEmail(g, summary) {
+  const hasQty = g.rows.some(r => String(r.qty).trim() !== '');
+  const hasAvail = g.rows.some(r => { const b = gridBest(r); return r.cells.some(c => c.p === b && c.q !== undefined && !isNaN(c.q)); });
+  const allocOf = r => allocate(num(r.qty), r.cells.map((c, i) => ({ i, p: c.p, q: c.q === undefined ? NaN : c.q })));
+  const head = ['Item Number', 'Description'].concat(hasQty ? ['Qty'] : []);
+  const text = [], rows = [];
+  const SHORT = 'color:#C55A11;font-weight:bold;';
+  if (summary) {
+    head.push('Best Price', 'Supplier', 'Model'); if (hasAvail) head.push('Avail. Qty'); text.push(head.join('\t'));
+    g.rows.forEach(r => {
+      const b = gridBest(r), al = allocOf(r);
+      const row = [{ t: r.code, style: 'text-align:center;' }, { t: r.desc }]; if (hasQty) row.push({ t: r.qty, style: 'text-align:center;' });
+      if (al) {
+        const ln = a => a.join('<br>');
+        const pr = al.parts.map((x, k) => `<span style="${k ? CSS_ALLOC : ''}">${money(x.p)}</span>`), sp = al.parts.map(x => `${esc(g.sups[x.i])} — ${esc(fmtQty(x.qty))} pcs`);
+        if (al.short) sp.push(`<span style="${SHORT}">Short ${esc(fmtQty(al.short))} pcs</span>`);
+        row.push({ html: ln(pr), style: 'text-align:right;white-space:nowrap;' + CSS_LOW }, { html: ln(sp), style: 'white-space:nowrap;' }, { html: ln(al.parts.map(x => esc(r.cells[x.i].m || ''))) });
+        if (hasAvail) row.push({ html: ln(al.parts.map(x => esc(fmtQty(r.cells[x.i].q)) || '—')), style: 'text-align:center;' });
+        rows.push(row);
+        text.push([r.code, r.desc].concat(hasQty ? [r.qty] : [], [al.parts.map(x => money(x.p)).join(' + '), al.parts.map(x => `${g.sups[x.i]} ${fmtQty(x.qty)} pcs`).join(' + ') + (al.short ? ` (short ${fmtQty(al.short)})` : ''), al.parts.map(x => r.cells[x.i].m).join(' + ')], hasAvail ? [al.parts.map(x => fmtQty(r.cells[x.i].q) || '—').join(' + ')] : []).join('\t'));
+        return;
+      }
+      const idx = r.cells.map((c, i) => c.p === b ? i : -1).filter(i => i >= 0);
+      const sup = idx.map(i => g.sups[i]).join(' / '), model = idx.map(i => r.cells[i].m).filter(Boolean).join(' / ');
+      const av = idx.map(i => r.cells[i].q).filter(q => q !== undefined && !isNaN(q)).map(fmtQty).join(' / '), short = idx.some(i => !isNaN(r.cells[i].q) && !isNaN(num(r.qty)) && r.cells[i].q < num(r.qty));
+      const bo = idx.length === 1 && hasO(r.cells[idx[0]]) ? strike(r.cells[idx[0]].o) : '';
+      row.push({ html: bo + money(b), style: 'text-align:right;' + (isNaN(b) ? '' : CSS_LOW) }, { t: sup }, { t: model });
+      if (hasAvail) row.push({ t: av, style: 'text-align:center;' + (short ? SHORT : '') });
+      rows.push(row); text.push([r.code, r.desc].concat(hasQty ? [r.qty] : [], [money(b), sup, model], hasAvail ? [av] : []).join('\t'));
+    });
+  } else {
+    head.push(...g.sups, 'Best Price', 'Supplier'); text.push(head.join('\t'));
+    g.rows.forEach(r => {
+      const b = gridBest(r), idx = r.cells.map((c, i) => c.p === b ? i : -1).filter(i => i >= 0), al = allocOf(r);
+      const order = new Map(al ? al.parts.map((x, k) => [x.i, { qty: x.qty, k }]) : []);
+      const row = [{ t: r.code, style: 'text-align:center;white-space:nowrap;' }, { t: r.desc }]; if (hasQty) row.push({ t: r.qty, style: 'text-align:center;' });
+      const trow = [r.code, r.desc].concat(hasQty ? [r.qty] : []);
+      r.cells.forEach((c, i) => {
+        const low = !isNaN(c.p) && c.p === b, od = order.get(i), split2 = od && od.k > 0;
+        const mcol = low ? '#2F6B3A' : split2 ? '#1F4E79' : '#595959', hq = !isNaN(c.p) && c.q !== undefined && !isNaN(c.q), short = hq && !isNaN(num(r.qty)) && c.q < num(r.qty) && !od;
+        const lines = [c.m ? `<span style="font-size:9pt;font-weight:normal;color:${mcol}">${esc(c.m)}</span>` : '',
+          hq ? `<span style="font-size:9pt;font-weight:${short ? 'bold' : 'normal'};color:${short ? '#C55A11' : mcol}">Avail. qty: ${esc(fmtQty(c.q))}</span>` : '',
+          od ? `<span style="font-size:9pt;font-weight:bold;color:${low ? '#006100' : '#1F4E79'}">Order: ${esc(fmtQty(od.qty))} pcs</span>` : ''].filter(Boolean);
+        row.push({ html: isNaN(c.p) ? '' : (hasO(c) ? strike(c.o) : '') + [money(c.p), ...lines].join('<br>'), style: 'text-align:right;white-space:nowrap;' + (low ? CSS_LOW : split2 ? CSS_ALLOC : '') });
+        const extra = [c.m, hq ? 'avail. qty ' + fmtQty(c.q) : '', od ? 'order ' + fmtQty(od.qty) : ''].filter(Boolean);
+        trow.push(isNaN(c.p) ? '' : (hasO(c) ? money(c.o) + ' → ' : '') + money(c.p) + (extra.length ? ` (${extra.join(', ')})` : ''));
+      });
+      if (al) {
+        const sp = al.parts.map(x => `${esc(g.sups[x.i])} — ${esc(fmtQty(x.qty))} pcs`); if (al.short) sp.push(`<span style="${SHORT}">Short ${esc(fmtQty(al.short))} pcs</span>`);
+        row.push({ html: al.parts.map((x, k) => `<span style="${k ? CSS_ALLOC : ''}">${money(x.p)}</span>`).join('<br>'), style: 'text-align:right;white-space:nowrap;' + CSS_LOW }, { html: sp.join('<br>'), style: 'white-space:nowrap;' });
+        trow.push(al.parts.map(x => money(x.p)).join(' + '), al.parts.map(x => `${g.sups[x.i]} ${fmtQty(x.qty)} pcs`).join(' + ') + (al.short ? ` (short ${fmtQty(al.short)})` : ''));
+      } else {
+        const sup = idx.map(i => g.sups[i]).join(' / '), bo = idx.length === 1 && hasO(r.cells[idx[0]]) ? strike(r.cells[idx[0]].o) : '';
+        row.push({ html: bo + money(b), style: 'text-align:right;white-space:nowrap;' + (isNaN(b) ? 'font-weight:bold;' : CSS_LOW) }, { t: sup, style: 'white-space:nowrap;' });
+        trow.push(money(b), sup);
+      }
+      rows.push(row); text.push(trow.join('\t'));
+    });
+  }
+  return { html: tableHTML(head, rows), text: text.join('\n') };
+}
+
+/* ---------- comparison as an image (for WhatsApp) ---------- */
+function gridImageModel(g) {
+  /* same rules as the email table: struck quoted price, lowest green, split cells blue with order qty */
+  const hasQty = g.rows.some(r => String(r.qty).trim() !== '');
+  const cols = [{ h: 'Item Number', w: 140, a: 'c' }, { h: 'Description', w: 210, a: 'l' }].concat(hasQty ? [{ h: 'Qty', w: 52, a: 'c' }] : [], g.sups.map(n => ({ h: n, w: 124, a: 'r' })), [{ h: 'Best Price', w: 104, a: 'r' }, { h: 'Supplier', w: 190, a: 'l' }]);
+  const rows = g.rows.map(r => {
+    const b = gridBest(r), idx = r.cells.map((c, i) => c.p === b ? i : -1).filter(i => i >= 0);
+    const al = allocate(num(r.qty), r.cells.map((c, i) => ({ i, p: c.p, q: c.q === undefined ? NaN : c.q })));
+    const order = new Map(al ? al.parts.map((x, k) => [x.i, { qty: x.qty, k }]) : []);
+    const out = [{ lines: [{ t: r.code, b: 1 }] }, { lines: [{ t: r.desc, wrap: 1 }] }];
+    if (hasQty) out.push({ lines: [{ t: String(r.qty ?? '') }] });
+    r.cells.forEach((c, i) => {
+      if (isNaN(c.p)) return out.push({ lines: [] });
+      const low = c.p === b, od = order.get(i), sp = od && od.k > 0, L = [];
+      if (hasO(c)) L.push({ t: money(c.o), s: 1, small: 1, col: '#7F7F7F' });
+      L.push({ t: money(c.p), b: 1, col: low ? '#006100' : sp ? '#1F4E79' : '#000' });
+      if (c.m) L.push({ t: c.m, small: 1, col: low ? '#2F6B3A' : '#595959' });
+      const hq = c.q !== undefined && !isNaN(c.q), short = hq && !isNaN(num(r.qty)) && c.q < num(r.qty) && !od;
+      if (hq) L.push({ t: 'Avail. qty: ' + fmtQty(c.q), small: 1, b: short, col: short ? '#C55A11' : '#595959' });
+      if (od) L.push({ t: 'Order: ' + fmtQty(od.qty) + ' pcs', small: 1, b: 1, col: low ? '#006100' : '#1F4E79' });
+      out.push({ lines: L, fill: low ? '#C6EFCE' : sp ? '#DDEBF7' : null });
+    });
+    if (al) {
+      out.push({ lines: al.parts.map((x, k) => ({ t: money(x.p), b: 1, col: k ? '#1F4E79' : '#006100' })), fill: '#C6EFCE' });
+      out.push({ lines: al.parts.map(x => ({ t: `${g.sups[x.i]} — ${fmtQty(x.qty)} pcs` })).concat(al.short ? [{ t: `Short ${fmtQty(al.short)} pcs`, b: 1, col: '#C55A11' }] : []) });
+    } else {
+      const one = idx.length === 1 ? r.cells[idx[0]] : null, L = [];
+      if (one && hasO(one)) L.push({ t: money(one.o), s: 1, small: 1, col: '#7F7F7F' });
+      if (!isNaN(b)) L.push({ t: money(b), b: 1, col: '#006100' });
+      out.push({ lines: L, fill: isNaN(b) ? null : '#C6EFCE' });
+      out.push({ lines: [{ t: idx.map(i => g.sups[i]).join(' / ') }] });
+    }
+    return out;
+  });
+  return { cols, rows };
+}
+function drawGridImage(g, title) {
+  const M = gridImageModel(g), SC = 2, PAD = 16, F = 'Calibri, Carlito, Arial, sans-serif';
+  const cv = document.createElement('canvas'), ctx = cv.getContext('2d');
+  const font = (l, size) => `${l && l.b ? 'bold ' : ''}${size}px ${F}`;
+  const wrap = (text, w, f) => { ctx.font = f; const words = String(text || '').split(/\s+/); const out = []; let cur = ''; words.forEach(wd => { const t = cur ? cur + ' ' + wd : wd; if (ctx.measureText(t).width > w && cur) { out.push(cur); cur = wd; } else cur = t; }); if (cur) out.push(cur); return out.length ? out : ['']; };
+  const LH = 17, SLH = 14;
+  M.cols.forEach(c => { ctx.font = `bold 14px ${F}`; c.hl = wrap(c.h, c.w - 14, ctx.font); });
+  const headH = Math.max(...M.cols.map(c => c.hl.length)) * LH + 14;
+  const rowLayout = M.rows.map(r => {
+    let h = 0;
+    const cells = r.map((c, i) => {
+      const w = M.cols[i].w - 16, lines = [];
+      c.lines.forEach(l => { if (l.wrap) wrap(l.t, w, font(l, 14)).forEach(t => lines.push(Object.assign({}, l, { t }))); else lines.push(l); });
+      const ch = lines.reduce((a, l) => a + (l.small ? SLH : LH), 0); h = Math.max(h, ch); return Object.assign({}, c, { lines, ch });
+    });
+    return { cells, h: Math.max(h, LH) + 14 };
+  });
+  const W = M.cols.reduce((a, c) => a + c.w, 0) + PAD * 2, titleH = title ? 34 : 8;
+  const H = PAD + titleH + headH + rowLayout.reduce((a, r) => a + r.h, 0) + PAD;
+  cv.width = W * SC; cv.height = H * SC; ctx.scale(SC, SC);
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+  if (title) { ctx.fillStyle = '#1F4E79'; ctx.font = `bold 17px ${F}`; ctx.textBaseline = 'middle'; ctx.fillText(title, PAD, PAD + 12); }
+  let y = PAD + titleH, x = PAD;
+  ctx.textBaseline = 'alphabetic';
+  M.cols.forEach(c => {
+    ctx.fillStyle = '#1F4E79'; ctx.fillRect(x, y, c.w, headH); ctx.strokeStyle = '#BFBFBF'; ctx.lineWidth = 1; ctx.strokeRect(x + .5, y + .5, c.w, headH);
+    ctx.fillStyle = '#fff'; ctx.font = `bold 14px ${F}`; ctx.textAlign = 'center';
+    const top = y + (headH - c.hl.length * LH) / 2 + 13; c.hl.forEach((t, k) => ctx.fillText(t, x + c.w / 2, top + k * LH)); x += c.w;
+  });
+  y += headH;
+  rowLayout.forEach(r => {
+    x = PAD;
+    r.cells.forEach((c, i) => {
+      const col = M.cols[i];
+      if (c.fill) { ctx.fillStyle = c.fill; ctx.fillRect(x, y, col.w, r.h); }
+      ctx.strokeStyle = '#BFBFBF'; ctx.strokeRect(x + .5, y + .5, col.w, r.h);
+      let ly = y + (r.h - c.ch) / 2;
+      c.lines.forEach(l => {
+        const size = l.small ? 12 : 14, lh = l.small ? SLH : LH; ly += lh;
+        ctx.font = font(l, size); ctx.fillStyle = l.col || '#000';
+        const tw = ctx.measureText(l.t).width, tx = col.a === 'r' ? x + col.w - 8 - tw : col.a === 'c' ? x + (col.w - tw) / 2 : x + 8;
+        ctx.textAlign = 'left'; ctx.fillText(l.t, tx, ly - 4);
+        if (l.s) { ctx.strokeStyle = l.col || '#000'; ctx.beginPath(); ctx.moveTo(tx, ly - 8); ctx.lineTo(tx + tw, ly - 8); ctx.stroke(); }
+      });
+      x += col.w;
+    });
+    y += r.h;
+  });
+  return cv;
+}
+async function shareGridImage(g, title) {
+  if (!g.sups.length) return toast('Enter at least one price first.', true);
+  const cv = drawGridImage(g, title), blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+  const name = `Comparison-${(title || 'prices').replace(/[^\w\-]+/g, '_').slice(0, 50)}.png`;
+  const file = new File([blob], name, { type: 'image/png' });
+  if (PHONE && navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: title || 'Price comparison' }); return; } catch (e) { if (e.name === 'AbortError') return; }
+  }
+  if (!PHONE && navigator.clipboard && window.ClipboardItem) {
+    try { await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]); return toast('Image copied — paste it into WhatsApp (Ctrl+V)'); } catch (e) {}
+  }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  toast('Image saved');
+}
+const imgTitle = (ref, date) => [ref, date ? fmtDate(date) : ''].filter(Boolean).join('  ·  ');
+
+/* ---------- autocomplete ---------- */
+const AC = {
+  el: null, input: null, opts: [], idx: -1,
+  open(input) {
+    const type = input.dataset.ac, src = SOURCES[type]; if (!src) return;
+    this.input = input; this.opts = src(input.value, input) || [];
+    if (!this.opts.length) return this.close();
+    const q = norm(input.value), auto = input.dataset.acauto;
+    this.idx = -1;
+    if (q) { const ex = this.opts.findIndex(o => norm(o.value) === q); if (ex >= 0) this.idx = ex; else if (auto === '1') this.idx = 0; else if (auto === 'prefix') this.idx = this.opts.findIndex(o => norm(o.value).startsWith(q)); }
+    this.render();
+  },
+  render() {
+    const el = $('#ac');
+    el.innerHTML = this.opts.map((o, i) => `<div data-i="${i}" class="${i === this.idx ? 'on' : ''}"><b>${esc(o.main)}</b>${o.tag ? `<em>${esc(o.tag)}</em>` : ''}${o.sub ? `<small>${esc(o.sub)}</small>` : ''}</div>`).join('');
+    const r = this.input.getBoundingClientRect(); el.hidden = false;
+    el.style.minWidth = Math.max(r.width, 260) + 'px';
+    const h = el.offsetHeight, below = innerHeight - r.bottom;
+    el.style.left = Math.min(r.left, innerWidth - el.offsetWidth - 8) + 'px';
+    el.style.top = (below < h + 8 && r.top > h ? r.top - h - 2 : r.bottom + 2) + 'px';
+    const on = el.querySelector('.on'); on && on.scrollIntoView({ block: 'nearest' });
+  },
+  close() { $('#ac').hidden = true; this.opts = []; this.idx = -1; },
+  get isOpen() { return !$('#ac').hidden; },
+  move(d) { if (!this.opts.length) return; this.idx = (this.idx + d + this.opts.length) % this.opts.length; this.render(); },
+  pick(i, byEnter) {
+    const o = this.opts[i], input = this.input; if (!o) return; this.close();
+    input.value = o.value; onField(input); const after = PICKED[input.dataset.ac]; after && after(input, o, byEnter);
+  }
+};
+document.addEventListener('input', e => { if (e.target.dataset && e.target.dataset.ac) AC.open(e.target); }, true);
+document.addEventListener('focusin', e => { const t = e.target; if (t.dataset && t.dataset.ac && t.dataset.acfocus === '1') AC.open(t); else if (AC.isOpen && t !== AC.input) AC.close(); });
+document.addEventListener('focusout', e => { if (e.target === AC.input) setTimeout(() => { if (document.activeElement !== AC.input) AC.close(); }, 120); });
+$('#ac').addEventListener('mousedown', e => { e.preventDefault(); const d = e.target.closest('[data-i]'); d && AC.pick(+d.dataset.i); });
+document.addEventListener('keydown', e => {
+  if (!AC.isOpen || e.target !== AC.input) return;
+  if (e.key === 'ArrowDown') { e.preventDefault(); AC.move(1); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); AC.move(-1); }
+  else if (e.key === 'Enter' && AC.idx >= 0) { e.preventDefault(); e.stopPropagation(); AC.pick(AC.idx, true); }
+  else if (e.key === 'Tab' && AC.idx >= 0) { AC.pick(AC.idx); }
+  else if (e.key === 'Escape') { e.preventDefault(); AC.close(); }
+}, true);
+window.addEventListener('scroll', () => AC.isOpen && AC.close(), true);
+window.addEventListener('resize', () => AC.isOpen && AC.close());
+
+function distinct(arr) { const m = new Map(); arr.forEach(s => { s = String(s || '').trim(); if (s && !m.has(s.toLowerCase())) m.set(s.toLowerCase(), s); }); return [...m.values()]; }
+const SOURCES = {
+  item(q) {
+    if (!q.trim()) return [];
+    return rank(S.items, i => [i.code, i.desc, i.brand], q).slice(0, 10).map(i => ({ value: i.code, main: i.code, sub: [i.desc, i.brand].filter(Boolean).join(' — ') }));
+  },
+  supadd(q) {
+    const used = new Set(S.cmp.sups.map(s => norm(s.name))), sent = new Set(S.rfq.sentTo.map(norm));
+    let list = q.trim() ? rank(S.vendors, v => [v.short, v.name, catLine(v), v.brands], q).sort((a, b) => used.has(norm(a.short)) - used.has(norm(b.short)))
+      : S.vendors.filter(v => !used.has(norm(v.short))).sort((a, b) => sent.has(norm(b.short)) - sent.has(norm(a.short)) || a.short.localeCompare(b.short));
+    return list.slice(0, 12).map(v => ({ value: v.short, main: v.short, sub: used.has(norm(v.short)) ? 'Already added — adds a second column for another brand' : v.name !== v.short ? v.name : catLine(v), tag: used.has(norm(v.short)) ? '2nd brand' : sent.has(norm(v.short)) ? 'RFQ sent' : '' }));
+  },
+  model(q, input) {
+    const sup = input.dataset.supname || '', code = input.dataset.code || (input.closest('tr') && (S.cmp.rows.find(r => r.id === input.closest('tr').dataset.r) || {}).code) || '';
+    const m = new Map();
+    S.history.forEach(h => {
+      const k = String(h.model || '').trim(); if (!k) return;
+      const o = m.get(k.toLowerCase()) || { v: k, n: 0, same: 0, sup: 0, sups: new Set() };
+      o.n++; o.sups.add(h.supplier);
+      if (norm(h.supplier) === norm(sup)) { o.sup++; if (code && norm(h.code) === norm(code)) o.same++; }
+      m.set(k.toLowerCase(), o);
+    });
+    let list = [...m.values()];
+    if (q.trim()) list = rank(list, o => [o.v], q);
+    list.sort((a, b) => (b.same - a.same) || (b.sup - a.sup) || (q.trim() ? 0 : b.n - a.n));
+    return list.slice(0, 10).map(o => ({ value: o.v, main: o.v, sub: o.same ? `${sup} quoted this for this item` : o.sup ? `Used by ${sup}` : [...o.sups].slice(0, 3).join(', '), tag: o.same ? 'this item' : '' }));
+  },
+  brand(q) { const l = distinct(S.items.map(i => i.brand).concat(S.rfq.rows.map(r => r.brand))); return rank(l, s => [s], q).slice(0, 8).map(s => ({ value: s, main: s })); },
+  type(q) { const l = distinct(['Genuine', 'Aftermarket', 'Genuine/Aftermarket'].concat(S.rfq.rows.map(r => r.type))); return rank(l, s => [s], q).slice(0, 8).map(s => ({ value: s, main: s })); }
+};
+const PICKED = {
+  item(input) {
+    const tr = input.closest('tr'), it = itemByCode(input.value); if (!tr || !it) return;
+    const d = tr.querySelector('[data-f=desc]'); if (d) { d.value = it.desc; onField(d); }
+    const b = tr.querySelector('[data-f=brand]'); if (b && !b.value && it.brand) { b.value = it.brand; onField(b); }
+    const q = tr.querySelector('[data-f=qty]'); q && q.focus();
+  },
+  supadd(input) { addSupplier(input.value); },
+  model(input, o, byEnter) { if (byEnter) cmpNextFrom(input, false); }
+};
+
+/* ---------- field edits (delegated) ---------- */
+function onField(el) {
+  const f = el.dataset.f, tr = el.closest('tr'), scope = el.closest('[data-scope]');
+  if (f === 'cmpdate') { S.cmp.date = el.value || today(); touch(); return; }
+  if (['cmpbranch', 'cmpprn', 'rfqbranch', 'rfqprn', 'pbranch', 'pprn'].includes(f)) {
+    const tgt = f.startsWith('cmp') ? S.cmp : f.startsWith('rfq') ? S.rfq : (S.pending.find(x => x.id === el.dataset.id) || {}).cmp; if (!tgt) return;
+    const key = f.endsWith('branch') ? 'branch' : 'prn'; tgt[key] = key === 'prn' ? cleanPrn(el.value) : el.value;
+    if (key === 'branch') el.classList.toggle('unset', !el.value);
+    touch(); const pc = el.closest('.pcard'), pt = pc && pc.querySelector('.ptitle'); if (pt) pt.textContent = draftName(tgt);
+    const pv = el.closest('.refbar') && el.closest('.refbar').querySelector('.refprev'); if (pv) pv.textContent = fmtRef(tgt) ? '→ ' + fmtRef(tgt) : '';
+    return;
+  }
+  const sc = scope && scope.dataset.scope;
+  if (sc === 'rfq') {
+    const r = S.rfq.rows.find(x => x.id === tr.dataset.r); if (!r) return; r[f] = el.value; touch();
+    const last = S.rfq.rows[S.rfq.rows.length - 1]; if (last === r && el.value.trim()) rerenderKeepFocus();
+    updateCount();
+  } else if (sc === 'cmp') {
+    const C = S.cmp;
+    if (f === 'supmodel') { const s = C.sups.find(x => x.id === el.dataset.s); if (s) { setTimeout(() => refreshHeadBrand(s.id));  s.model = el.value; $$(`td.cell[data-s="${s.id}"] [data-f=m]`).forEach(i => i.placeholder = el.value || 'Model'); } touch(); return; }
+    const r = C.rows.find(x => x.id === tr.dataset.r); if (!r) return;
+    if (f === 'code' || f === 'desc' || f === 'qty') {
+      r[f] = el.value; touch();
+      if (C.rows[C.rows.length - 1] === r && el.value.trim()) return rerenderKeepFocus();
+      if (f === 'code') updateHint(tr, r);
+      if (f === 'qty') refreshRow(tr, r);
+    } else if (f === 'p' || f === 'm' || f === 'n' || f === 'q') {
+      const td = el.closest('td'), sid = td.dataset.s, k = r.id + '|' + sid;
+      C.cells[k] = C.cells[k] || { p: '', m: '', n: '', q: '' }; C.cells[k][f] = el.value;
+      if (!C.cells[k].p && !C.cells[k].m && !C.cells[k].n && !C.cells[k].q) delete C.cells[k];
+      touch(); if (f !== 'm') refreshRow(tr, r); else { refreshHeadBrand(sid); C.rows.forEach(rr => { const t = $(`tr[data-r="${rr.id}"]`); if (t && !cmpEmpty(rr)) refreshRow(t, rr); }); }
+    }
+  } else if (sc === 'items') {
+    const it = S.items[+tr.dataset.i]; if (!it) return; it[f] = el.value; touch();
+  }
+}
+document.addEventListener('input', e => { if (e.target.dataset && e.target.dataset.f) onField(e.target); });
+document.addEventListener('change', e => { if (e.target.dataset && e.target.dataset.f === 'cmpdate') onField(e.target); });
+document.addEventListener('focusout', e => {
+  const el = e.target; if (!el.dataset || el.dataset.f !== 'code') return;
+  const tr = el.closest('tr'); if (!tr) return;
+  const it = itemByCode(el.value), d = tr.querySelector('[data-f=desc]');
+  if (it && d && !d.value) { d.value = it.desc; onField(d); }
+});
+/* ---------- bulk paste ---------- */
+function parseText(t) {
+  const lines = String(t || '').replace(/\r/g, '').split('\n');
+  while (lines.length && !lines[lines.length - 1].trim()) lines.pop();
+  const tab = lines.some(l => l.includes('\t')), bar = !tab && lines.some(l => l.includes('|'));
+  const sp = !tab && !bar && lines.some(l => / {2,}/.test(l.trim()));
+  return lines.map(l => (tab ? l.split('\t') : bar ? l.replace(/^\s*\||\|\s*$/g, '').split('|') : sp ? l.trim().split(/ {2,}/) : [l]).map(c => c.trim()));
+}
+function clipMatrix(cd) {
+  const html = cd.getData('text/html');
+  if (/<table/i.test(html)) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    /* email layouts nest tables: use the innermost table with the most rows */
+    const tables = [...doc.querySelectorAll('table')].filter(t => !t.querySelector('table')).sort((a, b) => b.rows.length - a.rows.length);
+    if (tables[0]) {
+      const rows = [...tables[0].rows].map(tr => [...tr.cells].map(c => c.textContent.replace(/\s+/g, ' ').trim())).filter(r => r.some(Boolean));
+      if (rows.length) return rows;
+    }
+  }
+  return parseText(cd.getData('text/plain'));
+}
+const parsePrice = v => num(String(v ?? '').replace(/[^\d.,\-]/g, ''));
+const RFQ_F = ['brand', 'type', 'code', 'desc', 'qty'], CMP_F = ['code', 'desc', 'qty'];
+document.addEventListener('paste', e => {
+  const el = e.target; if (!el.matches || !el.matches('table.grid input[data-f]')) return;
+  const sc = (el.closest('[data-scope]') || {}).dataset; if (!sc || !['rfq', 'cmp'].includes(sc.scope)) return;
+  const m = clipMatrix(e.clipboardData); if (m.length < 2 && (m[0] || []).length < 2) return; /* single value: normal paste */
+  e.preventDefault(); AC.close();
+  const f = el.dataset.f, rid = el.closest('tr').dataset.r;
+  if (sc.scope === 'rfq') gridPaste(S.rfq.rows, RFQ_F, f, rid, m, () => ({ id: uid(), brand: '', type: '', code: '', desc: '', qty: '' }), 'rfq');
+  else if (CMP_F.includes(f)) gridPaste(S.cmp.rows, CMP_F, f, rid, m, () => ({ id: uid(), code: '', desc: '', qty: '' }), 'cmp');
+  else if (['m', 'p', 'n'].includes(f)) cellPaste(el, m);
+});
+function gridPaste(rows, fields, f, rid, m, make, scope) {
+  let i = rows.findIndex(r => r.id === rid), n = 0; const start = fields.indexOf(f);
+  m.forEach(line => {
+    if (!rows[i]) rows.push(make());
+    const r = rows[i++];
+    line.forEach((v, j) => { const k = fields[start + j]; if (k) r[k] = v; });
+    if (r.code) { const it = itemByCode(r.code); if (it) { if (!r.desc) r.desc = it.desc; if ('brand' in r && !r.brand && it.brand) r.brand = it.brand; } }
+    if (line.some(Boolean)) n++;
+  });
+  touch(); renderView(); toast(`Pasted ${plural(n, 'row')}`);
+}
+function cellPaste(el, m) {
+  /* positional: down the supplier's column from this row; columns go model → price → negotiated */
+  const C = S.cmp, sid = el.closest('td').dataset.s, seq = { m: ['m', 'p', 'n'], p: ['p', 'n'], n: ['n'] }[el.dataset.f];
+  const rows = C.rows.filter(r => !cmpEmpty(r)); let i = rows.findIndex(r => r.id === el.closest('tr').dataset.r), n = 0, extra = 0;
+  m.forEach(line => {
+    const r = rows[i++]; if (!r) { if (line.some(Boolean)) extra++; return; }
+    const k = r.id + '|' + sid, c = C.cells[k] = C.cells[k] || { p: '', m: '', n: '' };
+    line.forEach((v, j) => { const key = seq[j]; if (!key) return; c[key] = key === 'm' ? v : (isNaN(parsePrice(v)) ? '' : String(parsePrice(v))); });
+    if (line.some(Boolean)) n++;
+  });
+  touch(); renderView();
+  toast(`Pasted ${plural(n, 'line')}${extra ? ` — ${extra} extra line${extra > 1 ? 's' : ''} had no item row and were skipped` : ''}`, !!extra);
+}
+
+/* ---------- paste a supplier's quote, matched by item number ---------- */
+const PQ_OPTS = [['ignore', 'Ignore'], ['code', 'Item number'], ['price', 'Price'], ['model', 'Model / brand'], ['neg', 'Negotiated price'], ['avail', 'Available qty'], ['desc', 'Description']];
+function pqGuess(mx, header) {
+  const cols = Math.max(...mx.map(r => r.length)), body = header ? mx.slice(1) : mx, map = Array(cols).fill('ignore');
+  const codes = new Set(S.cmp.rows.filter(r => r.code).map(r => norm(r.code)));
+  const h = header ? mx[0].map(x => String(x).toLowerCase()) : [];
+  const HK = [['neg', /nego|final|revised|offer|special/], ['avail', /avail|stock|in hand|on hand|supply qty|can supply/], ['price', /price|rate|amount|unit|cost|aed|dhs|net|value/], ['code', /item|part|code|p\/n|pn\b|ref|number|no\b/], ['model', /brand|model|make|origin|type|quality/], ['desc', /desc|name|detail/], ['ignore', /qty|quantity|pcs|uom|total|disc|vat|sl\b|s\.no|#/]];
+  const set = new Set();
+  h.forEach((t, i) => { for (const [k, re] of HK) if (re.test(t)) { if (k === 'ignore' || !set.has(k)) { map[i] = k; if (k !== 'ignore') set.add(k); } break; } });
+  const colVals = i => body.map(r => r[i] || '').filter(Boolean);
+  if (!set.has('code')) {
+    let best = -1, bs = 0; for (let i = 0; i < cols; i++) { if (map[i] !== 'ignore' && h.length) continue; const v = colVals(i); const sc = v.length ? v.filter(x => codes.has(norm(x))).length / v.length : 0; if (sc > bs) { bs = sc; best = i; } }
+    if (bs >= 0.3) { map[best] = 'code'; set.add('code'); }
+  }
+  if (!set.has('price')) {
+    const numCols = []; for (let i = 0; i < cols; i++) { if (map[i] !== 'ignore' || (h[i] && /qty|quantity|pcs/.test(h[i]))) continue; const v = colVals(i); if (v.length && v.filter(x => !isNaN(parsePrice(x)) && /\d/.test(x)).length / v.length >= 0.7) numCols.push(i); }
+    const dec = numCols.filter(i => colVals(i).some(x => /[.,]\d{1,2}\s*$/.test(x) || parsePrice(x) >= 50));
+    const pick = (dec.length ? dec : numCols).pop(); if (pick !== undefined) { map[pick] = 'price'; set.add('price'); }
+  }
+  if (!set.has('model')) {
+    for (let i = 0; i < cols; i++) { if (map[i] !== 'ignore' || (h[i] && HK.find(x => x[0] === 'ignore')[1].test(h[i]))) continue; const v = colVals(i); if (!v.length || v.some(x => !isNaN(num(x)))) continue;
+      const avg = v.reduce((a, x) => a + x.length, 0) / v.length, uniq = new Set(v.map(norm)).size / v.length;
+      if (avg <= 18 && (uniq <= 0.6 || v.length < 3)) { map[i] = 'model'; break; } }
+  }
+  return map;
+}
+function pqLooksHeader(mx) {
+  if (mx.length < 2) return false;
+  const codes = new Set(S.cmp.rows.filter(r => r.code).map(r => norm(r.code)));
+  return mx[0].every(c => isNaN(parsePrice(c)) || !/\d/.test(c)) && !mx[0].some(c => codes.has(norm(c)));
+}
+function openPasteQuote(sid) {
+  const C = S.cmp, sup = C.sups.find(s => s.id === sid); if (!sup) return;
+  const label = supLabels(C.sups, cmpModels)[C.sups.indexOf(sup)];
+  const st = { mx: [], header: false, map: [], by: 'code', addNew: false };
+  openModal(`<header><h2>Paste quote — ${esc(label)}</h2><p>Copy ${esc(sup.name)}'s price table from their email, Excel file or PDF and paste it below. Prices are matched to your items by item number, so the order doesn't matter.</p></header>
+    <div class="content"><textarea id="pqt" placeholder="Click here and press Ctrl+V"></textarea><div id="pqbody"></div></div>
+    <footer><span class="muted" id="pqsum" style="margin-right:auto"></span><button data-m="cancel">Cancel</button><button class="primary" data-m="apply" disabled>Fill prices</button></footer>`, m => {
+    const ta = m.querySelector('#pqt'), body = m.querySelector('#pqbody'), sum = m.querySelector('#pqsum'), apply = m.querySelector('[data-m=apply]');
+    const load = mx => { st.mx = mx.filter(r => r.some(Boolean)); st.header = pqLooksHeader(st.mx); st.map = pqGuess(st.mx, st.header); st.by = st.map.includes('code') ? 'code' : 'order'; draw(); };
+    ta.addEventListener('paste', e => { e.preventDefault(); const mx = clipMatrix(e.clipboardData); ta.value = mx.map(r => r.join('\t')).join('\n'); load(mx); });
+    ta.addEventListener('input', () => load(parseText(ta.value)));
+    const plan = () => {
+      const rows = C.rows.filter(r => !cmpEmpty(r)), data = st.header ? st.mx.slice(1) : st.mx, col = k => st.map.indexOf(k), get = (r, k) => col(k) < 0 ? '' : (r[col(k)] || '').trim();
+      return data.map((r, i) => {
+        const code = get(r, 'code'), price = parsePrice(get(r, 'price')), neg = parsePrice(get(r, 'neg')), model = get(r, 'model'), desc = get(r, 'desc'), avail = parsePrice(get(r, 'avail'));
+        const target = st.by === 'code' ? rows.find(x => code && norm(x.code) === norm(code)) : rows[i];
+        const old = target ? cell(target, sup) : null;
+        return { code, price, neg, model, desc, avail, target, old, has: !isNaN(price) || !isNaN(neg) };
+      });
+    };
+    const draw = () => {
+      if (!st.mx.length) { body.innerHTML = ''; sum.textContent = ''; apply.disabled = true; return; }
+      const cols = Math.max(...st.mx.map(r => r.length)), sample = i => (st.header ? st.mx[1] : st.mx[0] || [])[i] || '';
+      const p = plan(), ok = p.filter(x => x.target && x.has), nomatch = p.filter(x => !x.target && x.has), noprice = p.filter(x => !x.has);
+      const repl = ok.filter(x => x.old && String(x.old.p || '').trim() && !isNaN(x.price) && num(x.old.p) !== x.price).length;
+      body.innerHTML = `<div class="opts"><label><input type="checkbox" id="pqh" ${st.header ? 'checked' : ''}> First line is a header</label>
+        <span>Match by</span><label><input type="radio" name="pqby" value="code" ${st.by === 'code' ? 'checked' : ''} ${st.map.includes('code') ? '' : 'disabled'}> Item number</label>
+        <label><input type="radio" name="pqby" value="order" ${st.by === 'order' ? 'checked' : ''}> Row order (same order as your list)</label></div>
+        <div class="pqmap">${Array.from({ length: cols }, (_, i) => `<label>${st.header ? esc(st.mx[0][i] || `Column ${i + 1}`) : `Column ${i + 1}`}<select data-col="${i}">${PQ_OPTS.map(([k, l]) => `<option value="${k}" ${st.map[i] === k ? 'selected' : ''}>${l}</option>`).join('')}</select><small>${esc(sample(i))}</small></label>`).join('')}</div>
+        ${!st.map.includes('price') && !st.map.includes('neg') ? '<p class="warn" style="color:var(--amber)">Choose which column holds the price.</p>' : ''}
+        <div class="pqprev"><table><thead><tr><th>Pasted item</th><th>Your item</th><th>Model</th><th class="num">Price</th><th>Result</th></tr></thead><tbody>
+        ${p.map(x => `<tr class="${x.target && x.has ? '' : 'no'}"><td>${esc(x.code || '—')}</td><td>${x.target ? esc(x.target.code + (x.target.desc ? ' — ' + x.target.desc : '')) : ''}</td><td>${esc(x.model)}</td>
+          <td class="num">${isNaN(x.price) ? '' : money(x.price)}${!isNaN(x.neg) ? ` → <b>${money(x.neg)}</b>` : ''}${!isNaN(x.avail) ? `<br><span class="muted">avail. ${esc(fmtQty(x.avail))}</span>` : ''}</td>
+          <td class="st">${!x.has ? '<span class="warn">No price</span>' : !x.target ? (st.addNew && x.code ? '<span class="ok">Add as new item</span>' : '<span class="warn">Not in this comparison</span>') : x.old && String(x.old.p || '').trim() && !isNaN(x.price) && num(x.old.p) !== x.price ? `<span class="warn">Replaces ${money(num(x.old.p))}</span>` : '<span class="ok">Matched</span>'}</td></tr>`).join('')}
+        </tbody></table></div>
+        ${st.by === 'code' && nomatch.some(x => x.code) ? `<div class="opts"><label><input type="checkbox" id="pqadd" ${st.addNew ? 'checked' : ''}> Add the ${plural(nomatch.filter(x => x.code).length, 'item')} not in this comparison as new rows</label></div>` : ''}`;
+      const n = ok.length + (st.addNew ? nomatch.filter(x => x.code).length : 0);
+      sum.textContent = `${plural(ok.length, 'line')} matched${nomatch.length ? `, ${nomatch.length} not in comparison` : ''}${noprice.length ? `, ${noprice.length} without a price` : ''}${repl ? `, ${repl} will replace existing prices` : ''}`;
+      apply.disabled = !n; apply.textContent = n ? `Fill ${plural(n, 'price')}` : 'Fill prices';
+      body.querySelectorAll('select[data-col]').forEach(sel => sel.onchange = () => { const i = +sel.dataset.col, v = sel.value; if (v !== 'ignore') st.map = st.map.map((x, j) => j !== i && x === v ? 'ignore' : x); st.map[i] = v; if (v === 'code') st.by = 'code'; if (!st.map.includes('code')) st.by = 'order'; draw(); });
+      body.querySelector('#pqh').onchange = e => { st.header = e.target.checked; st.map = pqGuess(st.mx, st.header); st.by = st.map.includes('code') ? 'code' : 'order'; draw(); };
+      body.querySelectorAll('input[name=pqby]').forEach(r => r.onchange = () => { st.by = r.value; draw(); });
+      const ad = body.querySelector('#pqadd'); if (ad) ad.onchange = () => { st.addNew = ad.checked; draw(); };
+    };
+    m.querySelector('[data-m=cancel]').onclick = closeModal;
+    apply.onclick = () => {
+      const p = plan(); let n = 0, added = 0;
+      if (st.addNew) C.rows = C.rows.filter(r => !cmpEmpty(r));
+      p.forEach(x => {
+        if (!x.has) return; let r = x.target;
+        if (!r) { if (!(st.addNew && st.by === 'code' && x.code)) return; const it = itemByCode(x.code); r = { id: uid(), code: x.code, desc: x.desc || (it ? it.desc : ''), qty: '' }; C.rows.push(r); added++; }
+        const k = r.id + '|' + sup.id, c = C.cells[k] = C.cells[k] || { p: '', m: '', n: '' };
+        if (!isNaN(x.price)) c.p = String(x.price); if (!isNaN(x.neg)) c.n = String(x.neg); if (!isNaN(x.avail)) c.q = String(x.avail); if (x.model) c.m = x.model; n++;
+      });
+      touch(); closeModal(); renderView(); toast(`Filled ${plural(n, 'price')} for ${label}${added ? `, ${plural(added, 'new item')} added` : ''}`);
+    };
+    setTimeout(() => ta.focus(), 0);
+  }, false, true);
+}
+
+/* Enter moves down like Excel */
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter' || e.defaultPrevented) return;
+  const el = e.target; if (el.tagName !== 'INPUT' || !el.closest('table.grid')) return;
+  if (el.dataset.ac === 'supadd') { e.preventDefault(); if (el.value.trim()) addSupplier(el.value); return; }
+  if (el.dataset.f === 'p' && (e.ctrlKey || e.metaKey) && el.closest('[data-scope=cmp]')) { e.preventDefault(); return openNeg(el.closest('td')); }
+  if (['m', 'p', 'n'].includes(el.dataset.f) && e.altKey && el.closest('[data-scope=cmp]')) { e.preventDefault(); return openQty(el.closest('td')); }
+  if (['m', 'p', 'n', 'q', 'supmodel'].includes(el.dataset.f) && el.closest('[data-scope=cmp]')) { e.preventDefault(); return cmpNextFrom(el, e.shiftKey); }
+  const td = el.closest('td'), tr = el.closest('tr'); if (!td || !tr) return;
+  e.preventDefault();
+  const ci = [...tr.children].indexOf(td), ii = [...td.querySelectorAll('input')].indexOf(el);
+  let nx = e.shiftKey ? tr.previousElementSibling : tr.nextElementSibling;
+  if (nx) { const t = nx.children[ci]; const inp = t && t.querySelectorAll('input')[ii]; inp && (inp.focus(), inp.select()); }
+});
+
+/* comparison entry order per supplier: model -> price -> next item's model ... then "+ Add supplier" */
+function cmpNextFrom(el, back) {
+  const f = el.dataset.f, sid = el.dataset.s || (el.closest('td') && el.closest('td').dataset.s);
+  const cellsOf = () => $$(`tbody td.cell[data-s="${sid}"]`).filter(td => { const r = S.cmp.rows.find(x => x.id === td.parentElement.dataset.r); return r && !cmpEmpty(r); });
+  const focus = i => { if (!i) return; i.focus(); try { i.select(); } catch (e) {} };
+  if (f === 'supmodel') { const c = cellsOf()[0]; return focus(c && c.querySelector(back ? '.m' : el.value ? '.p' : '.m')); }
+  const cells = cellsOf(), td = el.closest('td'), i = cells.indexOf(td);
+  if (!back) {
+    if (f === 'm') return focus(td.querySelector('.p'));
+    const nx = cells[i + 1];
+    if (nx) return focus(nx.querySelector('.m'));
+    return focus($('th.add input'));
+  } else {
+    if (f === 'q') return focus(td.classList.contains('neg') || td.classList.contains('nopen') ? td.querySelector('.n') : td.querySelector('.p'));
+    if (f === 'n') return focus(td.querySelector('.p'));
+    if (f === 'p') return focus(td.querySelector('.m'));
+    const pv = cells[i - 1]; if (pv) return focus(pv.querySelector('.p'));
+    return focus($(`th.sup input[data-s="${sid}"]`));
+  }
+}
+function rerenderKeepFocus() {
+  const a = document.activeElement; let sel = null, pos = null;
+  if (a && a.dataset && a.dataset.f) { const tr = a.closest('tr'), td = a.closest('td'); sel = { r: tr && tr.dataset.r, f: a.dataset.f, s: td && td.dataset.s }; pos = a.selectionStart; }
+  renderView();
+  if (sel) {
+    let q = `tr[data-r="${sel.r}"] ${sel.s ? `td[data-s="${sel.s}"] ` : ''}[data-f="${sel.f}"]`;
+    const el = $(q); if (el) { el.focus(); try { el.setSelectionRange(pos, pos); } catch (e) {} if (el.dataset.ac && el.value) AC.open(el); }
+  }
+}
+
+/* ---------- tabs ---------- */
+const TABS = [['rfq', 'Quote request', 'Request'], ['cmp', 'Comparison', 'Compare'], ['pending', 'Pending', 'Pending'], ['hist', 'Price history', 'History'], ['vendors', 'Vendors', 'Vendors'], ['items', 'Items', 'Items'], ['data', 'Data & backup', 'Data']];
+let tab = localStorage.getItem('pd-tab') || 'rfq';
+function renderAll() { renderTabs(); renderBanner(); renderView(); }
+function renderTabs() { $('#tabs').innerHTML = TABS.map(([k, l, sh]) => `<button data-tab="${k}" class="${k === tab ? 'on' : ''}"><span class="tl">${l}</span><span class="ts">${sh}</span>${k === 'pending' && S.pending.length ? ` <span class="badge">${S.pending.length}</span>` : ''}</button>`).join(''); }
+function go(t) { tab = t; try { localStorage.setItem('pd-tab', t); } catch (e) {} AC.close(); renderTabs(); renderView(); scrollTo(0, 0); }
+function renderView() {
+  const v = $('#view');
+  if (cmpFocus && !S.cmp.sups.some(x => x.id === cmpFocus)) setCmpFocus(null);
+  v.innerHTML = ({ rfq: vRfq, cmp: vCmp, pending: vPending, hist: vHist, vendors: vVendors, items: vItems, data: vData })[tab]();
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-tab]'); b && go(b.dataset.tab); });
+$('#status').addEventListener('click', () => go('data'));
+function ensureBlank(arr, isEmpty, make) { while (arr.length > 1 && isEmpty(arr[arr.length - 1]) && isEmpty(arr[arr.length - 2])) arr.pop(); if (!arr.length || !isEmpty(arr[arr.length - 1])) arr.push(make()); }
+
+/* ---------- Quote request ---------- */
+const rfqEmpty = r => !(r.brand || r.type || r.code || r.desc || String(r.qty).trim());
+const rfqFilled = () => S.rfq.rows.filter(r => r.code || r.desc);
+function updateCount() { const c = $('#rfqCount'); if (c) c.textContent = plural(rfqFilled().length, 'item'); }
+function vRfq() {
+  ensureBlank(S.rfq.rows, rfqEmpty, () => ({ id: uid(), brand: '', type: '', code: '', desc: '', qty: '' }));
+  return `<div class="bar"><div><h1>Quote request</h1><p><span id="rfqCount">${plural(rfqFilled().length, 'item')}</span> &nbsp; <span class="refbar">${branchSelect('rfqbranch', S.rfq.branch)}${prnInput('rfqprn', S.rfq.prn)}<span class="refprev">${fmtRef(S.rfq) ? '→ ' + esc(fmtRef(S.rfq)) : ''}</span></span></p></div>
+    <div class="actions"><button class="ghost" data-act="rfq-clear">Clear list</button><button data-act="rfq-copy">Copy table</button><button data-act="rfq-to-cmp">Start comparison</button><button class="primary" data-act="rfq-email">Email vendors…</button></div></div>
+    <div class="sheet"><table class="grid" data-scope="rfq"><thead><tr><th></th><th>Brand</th><th>Type</th><th class="w-code">Item number</th><th class="w-desc">Description</th><th class="w-qty">Qty</th><th></th></tr></thead><tbody>
+    ${S.rfq.rows.map((r, i) => `<tr data-r="${r.id}" class="${rfqEmpty(r) ? 'blank' : ''}"><td class="n">${i + 1}</td>
+      <td style="width:130px" data-label="Brand"><input data-f="brand" data-ac="brand" value="${esc(r.brand)}" placeholder="${i === S.rfq.rows.length - 1 ? 'Add item…' : ''}"></td>
+      <td style="width:170px" data-label="Type"><input data-f="type" data-ac="type" value="${esc(r.type)}"></td>
+      <td class="w-code" data-label="Item number"><input data-f="code" data-ac="item" data-acauto="1" value="${esc(r.code)}"></td>
+      <td class="w-desc" style="width:380px" data-label="Description"><input data-f="desc" value="${esc(r.desc)}"></td>
+      <td class="w-qty" data-label="Qty"><input data-f="qty" class="num" value="${esc(r.qty)}"></td>
+      <td class="ctrl">${rfqEmpty(r) ? '' : `<button class="x" title="Remove row" data-act="rfq-del" data-id="${r.id}">×</button>`}</td></tr>`).join('')}
+    </tbody></table></div>
+    <p class="tip">Many items at once: copy the rows from Excel or an email and paste into the first empty cell (Ctrl+V). Columns fill left to right from where you paste.</p>`;
+}
+function rfqTable() {
+  const rows = rfqFilled();
+  return { html: tableHTML(['Brand', 'Type', 'Item Number', 'Description', 'Quantity'], rows.map(r => [{ t: r.brand }, { t: r.type }, { t: r.code, style: 'text-align:center;' }, { t: r.desc }, { t: r.qty, style: 'text-align:center;' }])),
+    text: [['Brand', 'Type', 'Item Number', 'Description', 'Quantity'].join('\t')].concat(rows.map(r => [r.brand, r.type, r.code, r.desc, r.qty].join('\t'))).join('\n'), n: rows.length };
+}
+function rfqSaveItems() { rfqFilled().forEach(r => r.code && upsertItem(r.code, r.desc, r.brand)); touch(); }
+async function rfqCopy() { const t = rfqTable(); if (!t.n) return toast('Add at least one item first.', true); rfqSaveItems(); (await copyRich(t.html, t.text)) ? toast(`Copied ${plural(t.n, 'item')} — paste into your email`) : toast('Copy failed. Select the table and press Ctrl+C.', true); }
+function rfqToCmp() {
+  const rows = rfqFilled(); if (!rows.length) return toast('Add at least one item first.', true);
+  if (!makeRoom('The comparison already has an inquiry in progress.\n\nMove it to Pending and start a new comparison with these items?')) return;
+  rfqSaveItems();
+  S.cmp = blankCmp(); S.cmp.branch = S.rfq.branch || ''; S.cmp.prn = S.rfq.prn || ''; S.cmp.rows = rows.map(r => ({ id: uid(), code: r.code, desc: r.desc, qty: r.qty }));
+  S.rfq.rows = []; S.rfq.branch = ''; S.rfq.prn = '';
+  touch(); go('cmp'); toast(`${plural(rows.length, 'item')} moved to the comparison. The quote request is cleared for the next one.`);
+}
+
+/* vendor picker for RFQ email */
+const pk = { q: '', spec: '', sel: new Set() };
+function openEmailPicker() {
+  const t = rfqTable(); if (!t.n) return toast('Add at least one item first.', true);
+  pk.q = ''; pk.spec = '';
+  openModal(`<header><h2>Email vendors</h2><p>Creates an email draft with the item table already in the body and the selected vendors in BCC. Open the downloaded draft and it appears in Outlook ready to send.</p></header>
+    <div class="content">
+      <div class="actions" style="margin-bottom:10px"><input class="search" id="pkq" placeholder="Search vendor, category or brand" style="flex:1"><button data-m="all">Select all shown</button><button class="ghost" data-m="none">Clear</button></div>
+      <div class="chips" id="pkchips"></div>
+      <div class="vlist" id="pklist"></div>
+      <div class="form" style="margin-top:12px"><label class="full">Subject<input id="pksub" value="${esc(S.rfq.subject)}"></label>
+        <label class="full">Message above the table<textarea id="pkintro" rows="3">${esc(S.rfq.intro)}</textarea></label>
+        <label class="full">Sign-off below the table<textarea id="pksign" rows="3">${esc(S.rfq.signoff)}</textarea></label></div>
+    </div>
+    <footer><span class="muted" id="pkcount" style="margin-right:auto"></span><button class="ghost" data-m="addr">Copy addresses</button><button data-m="send">Open in mail app</button><button class="primary" data-m="eml">Create email draft</button></footer>`, m => {
+    const draw = () => {
+      m.querySelector('#pkchips').innerHTML = S.categories.map(s => `<button class="chip ${pk.spec === s ? 'on' : ''}" data-spec="${esc(s)}">${esc(s)}</button>`).join('');
+      const list = pkList();
+      m.querySelector('#pklist').innerHTML = list.map(v => v.email
+        ? `<label><input type="checkbox" data-v="${v.id}" ${pk.sel.has(v.id) ? 'checked' : ''}><span><b>${esc(v.short)}</b> <span class="muted">${esc(v.name !== v.short ? v.name : '')}</span><small>${esc(v.email)}</small></span><span>${v.cats.length ? v.cats.map(c => `<span class="tag cat">${esc(c)}</span>`).join('') : '<span class="tag">—</span>'}</span></label>`
+        : `<label class="off"><input type="checkbox" disabled><span><b>${esc(v.short)}</b><small>No email address — skipped</small></span><span class="tag no">No email</span></label>`).join('') || '<div class="empty">No vendors match.</div>';
+      const n = pk.sel.size; m.querySelector('#pkcount').textContent = n ? `${plural(n, 'vendor')} selected` : 'No vendors selected';
+    };
+    m.querySelector('#pkq').oninput = e => { pk.q = e.target.value; draw(); };
+    m.querySelector('#pkchips').onclick = e => { const c = e.target.closest('[data-spec]'); if (!c) return; pk.spec = pk.spec === c.dataset.spec ? '' : c.dataset.spec; draw(); };
+    m.querySelector('#pklist').onchange = e => { const id = e.target.dataset.v; if (!id) return; e.target.checked ? pk.sel.add(id) : pk.sel.delete(id); draw(); };
+    m.querySelector('[data-m=all]').onclick = () => { pkList().filter(v => v.email).forEach(v => pk.sel.add(v.id)); draw(); };
+    m.querySelector('[data-m=none]').onclick = () => { pk.sel.clear(); draw(); };
+    m.querySelector('[data-m=addr]').onclick = async () => { const em = pkEmails(); if (!em.length) return toast('Select at least one vendor.', true); await navigator.clipboard.writeText(em.join('; ')).catch(() => {}); toast(`Copied ${plural(em.length, 'address')}`); };
+    const prep = () => {
+      const em = pkEmails(); if (!em.length) { toast('Select at least one vendor with an email address.', true); return null; }
+      S.rfq.subject = m.querySelector('#pksub').value.trim() || 'Request for Quotation';
+      S.rfq.intro = m.querySelector('#pkintro').value; S.rfq.signoff = m.querySelector('#pksign').value;
+      S.rfq.sentTo = [...pk.sel].map(id => (S.vendors.find(v => v.id === id) || {}).short).filter(Boolean);
+      rfqSaveItems(); return em;
+    };
+    m.querySelector('[data-m=eml]').onclick = () => {
+      const em = prep(); if (!em) return;
+      download(`RFQ-${today()}.eml`, buildEml(em, S.rfq.subject, S.rfq.intro, t.html, S.rfq.signoff), 'message/rfc822');
+      closeModal(); toast(`Email draft downloaded (${plural(em.length, 'vendor')} in BCC). Open it to send from Outlook.`);
+    };
+    m.querySelector('[data-m=send]').onclick = async () => {
+      const em = prep(); if (!em) return;
+      await copyRich(t.html, t.text);
+      location.href = `mailto:?bcc=${em.map(encodeURIComponent).join(',')}&subject=${encodeURIComponent(S.rfq.subject)}&body=${encodeURIComponent(S.rfq.intro + '\n\n')}`;
+      closeModal(); toast('Table copied. Paste it into the email body with Ctrl+V.');
+    };
+    draw();
+  }, false, true);
+}
+/* .eml draft: X-Unsent makes Outlook open it as a new message ready to send */
+function b64utf8(str) { const bytes = new TextEncoder().encode(str); let bin = ''; for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000)); return btoa(bin); }
+function buildEml(bcc, subject, intro, tableHtml, signoff) {
+  const para = t => String(t || '').trim() ? `<p style="margin:0 0 12px">${esc(t).replace(/\n/g, '<br>')}</p>` : '';
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#000">${para(intro)}${tableHtml}<br>${para(signoff)}</body></html>`;
+  const body = b64utf8(html).replace(/.{1,76}/g, '$&\r\n');
+  return ['To: ', 'Bcc: ' + bcc.join(', '), 'Subject: =?UTF-8?B?' + b64utf8(subject) + '?=', 'X-Unsent: 1', 'MIME-Version: 1.0',
+    'Content-Type: text/html; charset="UTF-8"', 'Content-Transfer-Encoding: base64', '', body].join('\r\n');
+}
+function pkList() {
+  let l = S.vendors.slice().sort((a, b) => (!!b.email - !!a.email) || a.short.localeCompare(b.short));
+  if (pk.spec) l = l.filter(v => v.cats.includes(pk.spec));
+  if (pk.q.trim()) l = rank(l, v => [v.short, v.name, catLine(v), v.brands, v.email], pk.q);
+  return l;
+}
+function pkEmails() { return [...pk.sel].map(id => S.vendors.find(v => v.id === id)).filter(v => v && v.email).map(v => v.email.trim()); }
+
+/* ---------- Comparison ---------- */
+const cmpEmpty = r => !(r.code || r.desc || String(r.qty).trim());
+const cell = (r, s) => S.cmp.cells[r.id + '|' + s.id] || { p: '', m: '' };
+function rowBest(r) {
+  let min = NaN, ids = [];
+  S.cmp.sups.forEach(s => { const p = cellEff(cell(r, s)); if (isNaN(p)) return; if (isNaN(min) || p < min) { min = p; ids = [s.id]; } else if (p === min) ids.push(s.id); });
+  return { min, ids };
+}
+function hintText(code) {
+  if (!String(code).trim()) return '';
+  const l = lastQuote(code); if (!l) return itemByCode(code) ? 'No past quotes' : 'New item';
+  return `Last best ${money(l.price)}${hasNeg(l) ? ` (negotiated ${money(l.final)})` : ''} from ${l.supplier}, ${fmtDate(l.date)}`;
+}
+function vCmp() {
+  const C = S.cmp;
+  ensureBlank(C.rows, cmpEmpty, () => ({ id: uid(), code: '', desc: '', qty: '' }));
+  const title = C.inq ? `Editing inquiry #${C.inq}` : C.pendingId ? 'Pending draft' : `New inquiry #${nextInq()}`, labels = supLabels(C.sups, cmpModels);
+  const head = `<tr><th class="sticky1 w-code">Item number</th><th class="sticky2 w-desc">Description</th><th class="w-qty">Qty</th>
+    ${C.sups.map((s, i) => `<th class="sup${cmpFocus === s.id ? ' focus' : ''}" data-sid="${s.id}"><div class="nm"><span data-act="sup-focus" data-s="${s.id}" title="${esc((vendorByShort(s.name) || {}).name || s.name)}">${esc(s.name)}<span class="dup" data-brand="${s.id}">${headBrand(s) ? esc(headBrand(s)) : labels[i] !== s.name ? esc(labels[i].slice(s.name.length + 2, -1)) : ''}</span></span><button class="pq" title="Paste quote for ${esc(labels[i])}" aria-label="Paste quote for ${esc(labels[i])}" data-act="pq-open" data-s="${s.id}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="2.5" width="10" height="12" rx="1.5"/><path d="M6 2.5h4v2H6z" fill="currentColor"/><path d="M5.5 8h5M5.5 10.5h5"/></svg></button><button class="x" title="Remove supplier" data-act="sup-del" data-s="${s.id}">×</button></div>
+      <input data-f="supmodel" data-s="${s.id}" data-ac="model" data-acfocus="1" data-acauto="prefix" data-supname="${esc(s.name)}" value="${esc(s.model)}" placeholder="Model (all items)"></th>`).join('')}
+    <th class="add"><input data-ac="supadd" data-acfocus="1" data-acauto="1" placeholder="+ Add supplier" aria-label="Add supplier"></th>
+    <th class="best num">Best price</th><th>Supplier</th><th>Model</th><th></th></tr>`;
+  const body = C.rows.map(r => {
+    const b = rowBest(r), bsup = C.sups.filter(s => b.ids.includes(s.id));
+    return `<tr data-r="${r.id}" class="${cmpEmpty(r) ? 'blank' : ''}">
+      <td class="sticky1 w-code" data-label="Item number"><input data-f="code" data-ac="item" data-acauto="1" value="${esc(r.code)}" placeholder="${cmpEmpty(r) ? 'Add item…' : ''}"></td>
+      <td class="sticky2 w-desc" data-label="Description"><input data-f="desc" value="${esc(r.desc)}"><div class="hint">${esc(hintText(r.code))}</div></td>
+      <td class="w-qty" data-label="Qty"><input data-f="qty" class="num" value="${esc(r.qty)}"></td>
+      ${C.sups.map((s, si) => { const c = cell(r, s); return `<td class="${cellCls(r, s.id, b)}" data-s="${s.id}" data-label="${esc(labels[si])}"><div class="cw"><input class="m" data-f="m" data-ac="model" data-acfocus="1" data-acauto="prefix" data-supname="${esc(s.name)}" value="${esc(c.m)}" placeholder="${esc(s.model || 'Model')}" aria-label="${esc(s.name)} model"><input class="p" data-f="p" inputmode="decimal" value="${esc(c.p)}" placeholder="Price" aria-label="${esc(s.name)} price"><input class="n" data-f="n" inputmode="decimal" value="${esc(c.n || '')}" placeholder="Negotiated" aria-label="${esc(s.name)} negotiated price" title="Negotiated price"><div class="qw" title="Quantity this supplier can supply">Avail<input class="q" data-f="q" inputmode="decimal" value="${esc(c.q || '')}" aria-label="${esc(s.name)} available quantity"></div><div class="ord">${esc(ordText(r, s.id))}</div></div><button class="nb" data-act="neg-open" tabindex="-1" title="Add negotiated price (Ctrl+Enter)">Neg.</button><button class="nb qb" data-act="qty-open" tabindex="-1" title="Add available quantity (Alt+Enter)">Qty</button></td>`; }).join('')}
+      <td class="addcol"></td>
+      ${(() => { const rc = rightCols(r); return `<td class="best res" data-label="Best price"><div class="rv">${rc.best}</div></td><td class="res bsup" data-label="Supplier"><div class="rv">${rc.sup}</div></td><td class="res bmod" data-label="Model"><div class="rv">${rc.mod}</div></td>`; })()}
+      <td class="ctrl">${cmpEmpty(r) ? '' : `<button class="x" title="Remove item" data-act="cmp-del" data-id="${r.id}">×</button>`}</td></tr>`;
+  }).join('');
+  return `<div class="bar"><div><h1>${title}</h1><p><span id="cmpStats">${cmpStats()}</span> &nbsp; <label class="muted">Date <input type="date" data-f="cmpdate" value="${esc(C.date)}" style="border:1px solid var(--line);border-radius:5px;padding:2px 6px"></label>
+    &nbsp; <span class="refbar">${branchSelect('cmpbranch', C.branch)}${prnInput('cmpprn', C.prn)}<span class="refprev">${fmtRef(C) && (C.branch || C.prn) ? '→ ' + esc(fmtRef(C)) : ''}</span>${!C.branch && !C.prn && C.ref ? `<span class="muted">Old reference: ${esc(C.ref)}</span>` : ''}</span></p></div>
+    <div class="actions"><button class="ghost danger" data-act="cmp-cancel">${C.inq ? "Cancel editing" : "Cancel"}</button><button data-act="cmp-park">Move to pending</button><button data-act="cmp-img" title="${PHONE ? 'Share the comparison as a picture (WhatsApp)' : 'Copy the comparison as a picture to paste into WhatsApp'}">${PHONE ? 'Share image' : 'Copy image'}</button><button data-act="cmp-copy-sum">Copy summary</button><button data-act="cmp-copy">Copy comparison</button><button class="primary" data-act="cmp-save">${C.inq ? 'Update inquiry #' + C.inq : 'Save to history'}</button></div></div>
+    <p class="mnote" id="focusNote">${focusNote()}</p>
+    <div class="sheet"><table class="grid" data-scope="cmp"><thead>${head}</thead><tbody>${body}</tbody></table></div>
+    ${C.sups.length ? `<p class="tip">To fill a supplier's prices in one go, click the clipboard icon next to their name and paste their price table. Prices are matched to your items by item number. To paste a list of items, paste into the Item number column.</p>` : `<p class="muted" style="margin-top:12px">Add suppliers as their quotes come in: type the first letters in “+ Add supplier”. Vendors you emailed the request to are listed first.</p>`}`;
+}
+/* columns for the same supplier are labelled by brand: header model, else the one model used in every cell, else a number */
+function supLabels(sups, modelsOf) {
+  const cnt = {}, seen = {}; sups.forEach(s => cnt[norm(s.name)] = (cnt[norm(s.name)] || 0) + 1);
+  return sups.map(s => {
+    const k = norm(s.name); seen[k] = (seen[k] || 0) + 1; if (cnt[k] < 2) return s.name;
+    let m = s.model; if (!m && modelsOf) { const ms = distinct(modelsOf(s)); if (ms.length === 1) m = ms[0]; }
+    return `${s.name} (${m || seen[k]})`;
+  });
+}
+const cmpModels = s => Object.entries(S.cmp.cells).filter(([k]) => k.endsWith('|' + s.id)).map(([, c]) => c.m);
+const cellEff = c => { const n = num(c.n); return isNaN(n) ? num(c.p) : n; };
+function rowAlloc(r) { return allocate(num(r.qty), S.cmp.sups.map(s => { const c = cell(r, s); return { i: s.id, p: cellEff(c), q: num(c.q) }; })); }
+function headBrand(s) { if (s.model) return s.model; const ms = distinct(cmpModels(s)); return ms.length === 1 ? ms[0] : ''; }
+function refreshHeadBrand(sid) {
+  const s = S.cmp.sups.find(x => x.id === sid), el = $(`[data-brand="${sid}"]`); if (!s || !el) return;
+  const lab = supLabels(S.cmp.sups, cmpModels)[S.cmp.sups.indexOf(s)], hb = headBrand(s);
+  el.textContent = hb ? hb : lab !== s.name ? lab.slice(s.name.length + 2, -1) : '';
+}
+const supLabelOf = s => supLabels(S.cmp.sups, cmpModels)[S.cmp.sups.indexOf(s)] || s.name;
+function rightCols(r) {
+  const b = rowBest(r), al = rowAlloc(r), byId = id => S.cmp.sups.find(s => s.id === id);
+  if (al) {
+    const sup = al.parts.map(x => `${esc(supLabelOf(byId(x.i)))} — ${esc(fmtQty(x.qty))} pcs`); if (al.short) sup.push(`<span style="color:var(--amber);font-weight:600">Short ${esc(fmtQty(al.short))} pcs</span>`);
+    return { best: '<span class="splitlbl">&nbsp;</span><br>' + al.parts.map((x, k) => `<span class="${k ? 'sp2' : ''}">${money(x.p)}</span>`).join('<br>'), sup: `<span class="splitlbl">${al.parts.length > 1 ? 'Split order' : 'Lowest has no stock'}</span><br>` + sup.join('<br>'),
+      mod: '<span class="splitlbl">&nbsp;</span><br>' + al.parts.map(x => esc(cell(r, byId(x.i)).m || byId(x.i).model || '—')).join('<br>'), al };
+  }
+  const bs = S.cmp.sups.filter(s => b.ids.includes(s.id));
+  return { best: money(b.min), sup: esc(bs.map(supLabelOf).join(' / ')), mod: esc(bs.map(s => cell(r, s).m || s.model).filter(Boolean).join(' / ')), al: null };
+}
+function cellCls(r, sid, b) {
+  const c = S.cmp.cells[r.id + '|' + sid] || {}, n = num(c.n), p = num(c.p);
+  const q = num(c.q), need = num(r.qty);
+  return 'cell' + (b.ids.includes(sid) ? ' low' : '') + (!isNaN(n) ? ' neg' : '') + (!isNaN(n) && !isNaN(p) && n > p ? ' negbad' : '') + (String(c.p || '').trim() ? ' hasp' : '')
+    + (!isNaN(q) ? ' hasq' : '') + (!isNaN(q) && !isNaN(need) && q < need ? ' qlow' : '') + allocCls(r, sid);
+}
+function allocCls(r, sid) { const al = rowAlloc(r); if (!al) return ''; const k = al.parts.findIndex(x => x.i === sid); return k < 0 ? '' : ' hasord' + (k > 0 ? ' alloc' : ''); }
+function ordText(r, sid) { const al = rowAlloc(r), x = al && al.parts.find(p => p.i === sid); return x ? `Order ${fmtQty(x.qty)}` : ''; }
+function openNeg(td) { if (!td) return; td.classList.add('nopen'); const n = td.querySelector('.n'); n.focus(); n.select(); }
+function openQty(td) { if (!td) return; td.classList.add('qopen'); const q = td.querySelector('.q'); q.focus(); q.select(); }
+document.addEventListener('focusout', e => { const el = e.target; if (el.dataset && el.dataset.f === 'q' && !el.value.trim()) setTimeout(() => { const td = el.closest('td'); if (td && !td.contains(document.activeElement)) td.classList.remove('qopen'); }, 0); });
+document.addEventListener('focusout', e => { const el = e.target; if (el.dataset && el.dataset.f === 'n' && !el.value.trim()) setTimeout(() => { const td = el.closest('td'); if (td && !td.contains(document.activeElement)) td.classList.remove('nopen'); }, 0); });
+let cmpFocus = null;
+function setCmpFocus(id) {
+  cmpFocus = cmpFocus === id || !S.cmp.sups.some(s => s.id === id) ? null : id;
+  let st = $('#focusCss'); if (!st) { st = document.createElement('style'); st.id = 'focusCss'; document.head.appendChild(st); }
+  st.textContent = cmpFocus ? `@media (max-width:760px){[data-scope=cmp] td.cell:not([data-s="${cmpFocus}"]){display:none!important}}` : '';
+  $$('th.sup').forEach(th => th.classList.toggle('focus', th.dataset.sid === cmpFocus));
+  const n = $('#focusNote'); if (n) n.innerHTML = focusNote();
+}
+const focusNote = () => { const s = S.cmp.sups.find(x => x.id === cmpFocus); return s ? `Showing only <b>${esc(s.name)}</b> — tap the name again to show all suppliers.` : (S.cmp.sups.length ? 'Tap a supplier name to show only that supplier while entering its quote.' : ''); };
+function cmpStats() { const C = S.cmp; return `${plural(C.rows.filter(r => !cmpEmpty(r)).length, 'item')}, ${plural(C.sups.length, 'supplier')}, ${plural(Object.values(C.cells).filter(c => !isNaN(num(c.p))).length, 'price')}`; }
+function refreshRow(tr, r) {
+  const st = $('#cmpStats'); if (st) st.textContent = cmpStats();
+  const b = rowBest(r), bs = S.cmp.sups.filter(s => b.ids.includes(s.id));
+  tr.querySelectorAll('td.cell').forEach(td => { const no = td.classList.contains('nopen'), qo = td.classList.contains('qopen'); td.className = cellCls(r, td.dataset.s, b) + (no ? ' nopen' : '') + (qo ? ' qopen' : ''); });
+  tr.querySelectorAll('td.cell').forEach(td => { const o = td.querySelector('.ord'); if (o) o.textContent = ordText(r, td.dataset.s); });
+  const rc = rightCols(r); tr.querySelector('td.best .rv').innerHTML = rc.best; tr.querySelector('td.bsup .rv').innerHTML = rc.sup; tr.querySelector('td.bmod .rv').innerHTML = rc.mod;
+}
+function updateHint(tr, r) { const h = tr.querySelector('.hint'); if (h) h.textContent = hintText(r.code); }
+function addSupplier(name) {
+  name = String(name || '').trim(); if (!name) return;
+  let v = vendorByShort(name);
+  if (!v) {
+    if (!confirm(`“${name}” is not in your vendor list.\n\nAdd it as a new vendor? You can fill in the contact details later on the Vendors tab.`)) return;
+    v = { id: uid(), name, short: name, contact: '', phone: '', email: '', cats: [], brands: '' }; S.vendors.push(v);
+  }
+  const again = S.cmp.sups.some(s => norm(s.name) === norm(v.short));
+  S.cmp.sups.push({ id: uid(), name: v.short, model: '' }); touch(); AC.close(); renderView();
+  const first = $(`td.cell[data-s="${S.cmp.sups[S.cmp.sups.length - 1].id}"] .m`), hdr = $('th.add input');
+  (first || hdr).focus();
+  if (again) toast(`Second ${v.short} column added. Enter its brand/model in the header or per item.`);
+}
+function cmpGrid() {
+  const C = S.cmp, rows = C.rows.filter(r => !cmpEmpty(r));
+  const sups = C.sups.filter(s => rows.some(r => !isNaN(cellEff(cell(r, s)))));
+  const lab = supLabels(C.sups, cmpModels), labOf = s => lab[C.sups.indexOf(s)];
+  return { rows: rows.map(r => ({ code: r.code, desc: r.desc, qty: r.qty, cells: sups.map(s => { const c = cell(r, s), n = num(c.n), p = num(c.p); return { p: cellEff(c), o: !isNaN(n) && !isNaN(p) && p !== n ? p : NaN, m: c.m || s.model || '', q: num(c.q) }; }) })), sups: sups.map(labOf), names: sups.map(s => s.name) };
+}
+async function cmpCopy(summary) {
+  const g = cmpGrid(); if (!g.sups.length) return toast('Enter at least one price first.', true);
+  const t = gridToEmail(g, summary);
+  (await copyRich(t.html, t.text)) ? toast(summary ? 'Summary copied — paste into your email' : 'Comparison copied — paste into your email') : toast('Copy failed.', true);
+}
+function cmpSave() {
+  const C = S.cmp, rows = C.rows.filter(r => !cmpEmpty(r)), out = [];
+  rows.forEach(r => C.sups.forEach(s => { const c = cell(r, s); let p = num(c.p), n = num(c.n), q = num(c.q); if (isNaN(p) && !isNaN(n)) { p = n; n = NaN; } if (!isNaN(p)) out.push({ r, s, p, n: isNaN(n) ? null : n, q: isNaN(q) ? null : q, m: c.m || s.model || '' }); }));
+  if (!out.length) return toast('Nothing to save — enter at least one price.', true);
+  const up = out.filter(o => o.n !== null && o.n > o.p).length;
+  if (up && !confirm(`${plural(up, 'negotiated price')} ${up === 1 ? 'is' : 'are'} higher than the quoted price. Save anyway?`)) return;
+  const noCode = rows.filter(r => !String(r.code).trim() && out.some(o => o.r === r));
+  if (noCode.length && !confirm(`${plural(noCode.length, 'priced item')} ha${noCode.length === 1 ? 's' : 've'} no item number. Save anyway?`)) return;
+  const inq = C.inq || nextInq(), nItems = new Set(out.map(o => o.r.id)).size;
+  if (!C.branch && !confirm('No branch is selected for this inquiry. Save anyway?')) return;
+  if (!confirm(`${C.inq ? 'Update' : 'Save'} ${plural(out.length, 'price')} for ${plural(nItems, 'item')} as inquiry #${inq}${fmtRef(C) ? ` (${fmtRef(C)})` : ''}?`)) return;
+  if (C.inq) S.history = S.history.filter(h => h.inq !== inq);
+  out.forEach(o => S.history.push({ id: uid(), date: C.date || today(), inq, code: String(o.r.code).trim(), desc: o.r.desc, supplier: o.s.name, model: o.m, price: o.p, qty: o.r.qty, final: o.n, avail: o.q, ref: fmtRef(C), branch: C.branch || '', prn: cleanPrn(C.prn) }));
+  rows.forEach(r => r.code && upsertItem(r.code, r.desc));
+  S.cmp = blankCmp(); touch(); renderTabs(); renderView(); toast(`Saved inquiry #${inq}: ${plural(out.length, 'price')}${C.pendingId ? ' — removed from Pending' : ''}`);
+}
+function cmpCancel() {
+  const C = S.cmp, busy = C.rows.some(r => !cmpEmpty(r)) || C.sups.length;
+  const msg = C.inq ? `Cancel editing inquiry #${C.inq}?\n\nYour changes are discarded. The saved inquiry in history stays as it was.`
+    : C.pendingId ? 'Cancel and delete this pending draft?\n\nTo keep it for later, use “Move to pending” instead.'
+    : 'Cancel this comparison and clear the table?\n\nItems, suppliers and prices not saved to history will be removed.';
+  if (busy && !confirm(msg)) return;
+  S.cmp = blankCmp(); touch(); AC.close(); renderTabs(); renderView(); if (busy) toast(C.inq ? 'Editing cancelled' : C.pendingId ? 'Draft deleted' : 'Comparison cleared');
+}
+function openInquiry(inq) {
+  if (!makeRoom(`The comparison already has an inquiry in progress.\n\nMove it to Pending and open inquiry #${inq}?`)) return;
+  const hs = S.history.filter(h => h.inq === inq); const nc = blankCmp(); nc.inq = inq; nc.date = hs[0] ? hs[0].date : today(); const h0 = hs.find(h => h.branch || h.prn || h.ref) || {}; nc.branch = h0.branch || ''; nc.prn = h0.prn || ''; nc.ref = nc.branch || nc.prn ? '' : (h0.ref || '');
+  const rmap = new Map();
+  hs.forEach(h => {
+    const rk = norm(h.code) || 'd:' + norm(h.desc);
+    if (!rmap.has(rk)) { const r = { id: uid(), code: h.code, desc: h.desc, qty: h.qty ?? '' }; rmap.set(rk, r); nc.rows.push(r); }
+    const r = rmap.get(rk);
+    let s = nc.sups.find(x => norm(x.name) === norm(h.supplier) && !nc.cells[r.id + '|' + x.id]);
+    if (!s) { s = { id: uid(), name: h.supplier, model: '' }; nc.sups.push(s); }
+    nc.cells[r.id + '|' + s.id] = { p: String(h.price), m: h.model || '', n: hasNeg(h) ? String(h.final) : '', q: h.avail !== null && h.avail !== undefined && !isNaN(h.avail) ? String(h.avail) : '' };
+  });
+  S.cmp = nc; touch(); go('cmp');
+}
+
+/* ---------- Pending drafts ---------- */
+function parkCmp() {
+  const C = S.cmp; if (!cmpHasData(C)) return null;
+  const now = new Date().toISOString(), id = C.pendingId || uid();
+  const copy = JSON.parse(JSON.stringify(C)); delete copy.pendingId; delete copy.created;
+  S.pending = S.pending.filter(p => p.id !== id);
+  const d = { id, created: C.created || now, updated: now, cmp: copy }; S.pending.unshift(d);
+  S.cmp = blankCmp(); touch(); return d;
+}
+/* ask before replacing an inquiry in progress; OK parks it in Pending */
+function makeRoom(msg) { if (!cmpHasData(S.cmp)) return true; if (!confirm(msg)) return false; parkCmp(); return true; }
+function cmpPark() {
+  if (!cmpHasData(S.cmp)) return toast('Nothing to move — the comparison is empty.', true);
+  const d = parkCmp(); AC.close(); renderTabs(); renderView();
+  toast(`Moved to Pending: ${draftName(d.cmp)}`);
+}
+function openPending(id) {
+  const p = S.pending.find(x => x.id === id); if (!p) return;
+  if (!makeRoom(`The comparison already has an inquiry in progress.\n\nMove it to Pending and open “${draftName(p.cmp)}”?`)) return;
+  S.pending = S.pending.filter(x => x.id !== id);
+  S.cmp = normCmp(Object.assign(JSON.parse(JSON.stringify(p.cmp)), { pendingId: p.id, created: p.created }));
+  touch(); go('cmp');
+}
+function draftName(C) {
+  if (fmtRef(C)) return fmtRef(C);
+  const items = C.rows.filter(r => r.code || r.desc);
+  if (!items.length) return 'Untitled draft';
+  const first = items[0].desc || items[0].code;
+  return items.length > 1 ? `${first} + ${items.length - 1} more` : first;
+}
+function fmtWhen(iso) { if (!iso) return ''; const d = new Date(iso); return `${fmtDate(iso.slice(0, 10))}, ${d.toTimeString().slice(0, 5)}`; }
+function pendingCard(C, opts) {
+  return withCmp(C, () => {
+    const rows = C.rows.filter(r => !cmpEmpty(r)), lab = supLabels(C.sups, cmpModels);
+    const waiting = rows.filter(r => isNaN(rowBest(r).min)).length;
+    const list = rows.map(r => {
+      const b = rowBest(r), al = rowAlloc(r), labOf = id => lab[C.sups.findIndex(s => s.id === id)];
+      const who = al ? al.parts.map(x => `${labOf(x.i)} ${fmtQty(x.qty)}`).join(' + ') + (al.short ? ` (short ${fmtQty(al.short)})` : '') : C.sups.filter(s => b.ids.includes(s.id)).map(s => lab[C.sups.indexOf(s)]).join(' / ');
+      return `<tr><td>${esc(r.code)}${r.desc ? ` <span class="muted">${esc(r.desc)}</span>` : ''}</td><td class="pr">${isNaN(b.min) ? '<span class="wait">Waiting for prices</span>' : `<b>${money(b.min)}</b> <span class="muted">${esc(who)}</span>`}</td></tr>`;
+    }).join('');
+    return `<article class="pcard${opts.live ? ' live' : ''}"><header>
+      <b class="ptitle" style="font:700 17px var(--cond)">${esc(draftName(C))}</b>
+      ${opts.live ? '' : `<div class="refbar">${branchSelect('pbranch', C.branch, `data-id="${opts.id}"`)}${prnInput('pprn', C.prn, `data-id="${opts.id}"`)}</div>`}
+      <div class="meta">${opts.live ? 'Open in the Comparison tab now' : `Started ${esc(fmtWhen(opts.created))}${opts.updated !== opts.created ? `, updated ${esc(fmtWhen(opts.updated))}` : ''}`}${C.inq ? ` — editing inquiry #${C.inq}` : ''}</div>
+      <div class="meta">${withCmp(C, cmpStats)}${waiting ? `, <span class="wait">${plural(waiting, 'item')} without a price</span>` : ''}</div></header>
+      ${rows.length ? `<table>${list}</table>` : ''}
+      ${C.sups.length ? `<div class="sups">${lab.map(l => `<span class="tag">${esc(l)}</span>`).join('')}</div>` : ''}
+      <footer>${opts.live ? `<button class="primary" data-tab="cmp">Go to comparison</button><button data-act="cmp-park">Move to pending</button>`
+        : `<button class="primary" data-act="p-open" data-id="${opts.id}">Open</button><button data-act="p-copy" data-id="${opts.id}">Copy comparison</button><button class="ghost danger" data-act="p-del" data-id="${opts.id}">Delete</button>`}</footer></article>`;
+  });
+}
+function vPending() {
+  const live = cmpHasData(S.cmp);
+  const list = S.pending.slice().sort((a, b) => b.updated.localeCompare(a.updated));
+  return `<div class="bar"><div><h1>Pending</h1><p>${plural(S.pending.length, 'draft')} waiting for quotes or approval</p></div></div>
+    ${!list.length && !live ? `<div class="empty">No pending drafts. In the Comparison tab, use “Move to pending” to park an inquiry while you wait for more quotes.</div>` : ''}
+    <div class="pcards">${live ? pendingCard(S.cmp, { live: true }) : ''}${list.map(p => pendingCard(p.cmp, { id: p.id, created: p.created, updated: p.updated })).join('')}</div>`;
+}
+
+/* ---------- History ---------- */
+let hq = '', hmode = 'group', hbranch = '';
+function histGroupGrid(hs) {
+  /* same supplier twice in one inquiry (two brands) becomes two columns */
+  const rows = [], rmap = new Map(), cols = [], filled = new Set();
+  hs.forEach(h => {
+    const rk = norm(h.code) || 'd:' + norm(h.desc);
+    if (!rmap.has(rk)) { const r = { code: h.code, desc: h.desc, qty: h.qty ?? '', cells: [] }; rmap.set(rk, r); rows.push(r); }
+    const r = rmap.get(rk);
+    let ci = cols.findIndex((c, i) => norm(c.name) === norm(h.supplier) && !filled.has(rk + '|' + i));
+    if (ci < 0) { cols.push({ name: h.supplier, model: '' }); ci = cols.length - 1; }
+    filled.add(rk + '|' + ci); r.cells[ci] = { p: effP(h), o: hasNeg(h) && h.price !== h.final ? h.price : NaN, m: h.model, q: h.avail === null || h.avail === undefined ? NaN : h.avail }; (cols[ci].ms = cols[ci].ms || []).push(h.model);
+  });
+  rows.forEach(r => { for (let i = 0; i < cols.length; i++) r.cells[i] = r.cells[i] || { p: NaN, m: '', q: NaN }; });
+  return { rows, sups: supLabels(cols, c => c.ms || []) };
+}
+function lowestSet() { const m = new Map(); S.history.forEach(h => { const k = h.inq + '|' + norm(h.code); m.set(k, Math.min(m.has(k) ? m.get(k) : Infinity, effP(h))); }); return m; }
+function vHist() {
+  const q = hq.trim(), inBranch = h => !hbranch || h.branch === hbranch || (!h.branch && String(h.ref || '').startsWith(hbranch)),
+    match = h => inBranch(h) && (!q || rank([h], x => [x.code, x.desc, x.supplier, x.model, x.ref, x.prn], q).length);
+  const inqs = [...new Set(S.history.map(h => h.inq))].sort((a, b) => b - a);
+  let content = '';
+  let insight = '';
+  if (q) {
+    const codes = [...new Set(S.history.filter(match).map(h => h.code))];
+    if (codes.length === 1) {
+      const eff = effP;
+      const hs = S.history.filter(h => h.code === codes[0]), lo = hs.slice().sort((a, b) => eff(a) - eff(b))[0], last = lastQuote(codes[0]);
+      insight = `<div class="insight"><div><span>${esc(codes[0])}</span><b style="font-size:16px">${esc(hs[0].desc)}</b></div><div><b>${hs.length}</b><span>quotes in ${plural(new Set(hs.map(h => h.inq)).size, 'inquiry')}</span></div>
+        <div><b>${money(eff(lo))}</b><span>lowest ever${hasNeg(lo) ? ' (negotiated)' : ''}, ${esc(lo.supplier)} ${esc(fmtDate(lo.date))}</span></div><div><b>${money(eff(last))}</b><span>last best${hasNeg(last) ? ' (negotiated)' : ''}, ${esc(last.supplier)} ${esc(fmtDate(last.date))}</span></div></div>`;
+    }
+  }
+  if (!S.history.length) content = `<div class="empty">No saved inquiries yet. Prices you save from the Comparison tab appear here.</div>`;
+  else if (hmode === 'group') {
+    const shown = inqs.filter(i => S.history.some(h => h.inq === i && match(h)));
+    content = shown.map(i => {
+      const hs = S.history.filter(h => h.inq === i), g = histGroupGrid(hs);
+      return `<section class="group"><header><h3>Inquiry #${i}${(hs.find(h => h.ref) || {}).ref ? ` <span style="font-weight:500;color:var(--mute)">${esc(hs.find(h => h.ref).ref)}</span>` : ''}</h3><span class="muted">${esc(fmtDate(hs[0].date))}, ${plural(g.rows.length, 'item')}, ${plural(hs.length, 'price')}</span>
+        <div class="actions"><button data-act="h-img" data-inq="${i}">${PHONE ? 'Share image' : 'Copy image'}</button><button data-act="h-copy" data-inq="${i}">Copy comparison</button><button data-act="h-open" data-inq="${i}">Open in comparison</button><button class="ghost danger" data-act="h-del" data-inq="${i}">Delete</button></div></header>
+        <div class="body eml">${gridToEmail(g, false).html}</div></section>`;
+    }).join('') || `<div class="empty">No inquiries match “${esc(q)}”.</div>`;
+  } else {
+    const low = lowestSet();
+    const rows = S.history.filter(match).sort((a, b) => b.date.localeCompare(a.date) || b.inq - a.inq);
+    content = `<div class="sheet"><table class="grid"><thead><tr><th>Date</th><th>Inquiry</th><th>Item number</th><th>Description</th><th>Supplier</th><th>Model</th><th class="num">Quoted</th><th class="num">Negotiated</th><th class="num">Avail. qty</th><th>Lowest</th><th></th></tr></thead><tbody>
+      ${rows.map(h => { const isLow = low.get(h.inq + '|' + norm(h.code)) === effP(h), lowCss = 'background:var(--low-bg);color:var(--low-ink);font-weight:700'; return `<tr><td class="txt" data-label="Date">${esc(fmtDate(h.date))}</td><td class="txt" data-label="Inquiry">#${h.inq}</td><td class="txt" data-label="Item number">${esc(h.code)}</td><td class="txt" data-label="Description">${esc(h.desc)}</td><td class="txt">${esc(h.supplier)}</td><td class="txt">${esc(h.model)}</td>
+      <td class="txt num" style="${isLow && !hasNeg(h) ? lowCss : hasNeg(h) ? 'text-decoration:line-through;color:var(--mute)' : ''}">${money(h.price)}</td><td class="txt num" style="${isLow && hasNeg(h) ? lowCss : 'font-weight:700;color:var(--navy)'}">${hasNeg(h) ? money(h.final) : ''}</td><td class="txt num">${h.avail !== null && h.avail !== undefined ? esc(fmtQty(h.avail)) : ''}</td><td class="txt">${isLow ? 'Yes' : ''}</td><td class="ctrl"><button class="x" title="Delete this price" data-act="h-del-row" data-id="${h.id}">×</button></td></tr>`; }).join('') || `<tr><td colspan="11" class="empty">No prices match “${esc(q)}”.</td></tr>`}
+      </tbody></table></div>`;
+  }
+  return `<div class="bar"><div><h1>Price history</h1><p>${plural(inqs.length, 'inquiry')}, ${plural(S.history.length, 'price')}</p></div>
+    <div class="actions"><select class="refsel${hbranch ? '' : ' unset'}" id="hbranch" aria-label="Filter by branch"><option value="">All branches</option>${S.branches.map(b => `<option ${b === hbranch ? 'selected' : ''}>${esc(b)}</option>`).join('')}</select><input class="search" id="hq" placeholder="Search item, supplier, model or PRN" value="${esc(hq)}">
+    <div class="seg"><button data-act="h-mode" data-m="group" class="${hmode === 'group' ? 'on' : ''}">By inquiry</button><button data-act="h-mode" data-m="rows" class="${hmode === 'rows' ? 'on' : ''}">All prices</button></div></div></div>
+    ${insight}${content}`;
+}
+
+/* ---------- Vendors ---------- */
+let vq = '', vspec = '';
+function vVendors() {
+  let l = S.vendors.slice().sort((a, b) => a.short.localeCompare(b.short));
+  if (vspec) l = l.filter(v => vspec === '__none' ? !v.cats.length : v.cats.includes(vspec));
+  if (vq.trim()) l = rank(l, v => [v.short, v.name, v.contact, v.email, catLine(v), v.brands, v.phone], vq);
+  const withEmail = S.vendors.filter(v => v.email).length, cnt = c => S.vendors.filter(v => v.cats.includes(c)).length;
+  return `<div class="bar"><div><h1>Vendors</h1><p>${plural(S.vendors.length, 'vendor')}, ${withEmail} with email</p></div>
+    <div class="actions"><input class="search" id="vq" placeholder="Search name, contact, email, category, brand" value="${esc(vq)}"><button data-act="v-import">Import from Excel</button><button class="primary" data-act="v-add">Add vendor</button></div></div>
+    <div class="chips">${S.categories.map(s => `<button class="chip ${vspec === s ? 'on' : ''}" data-act="v-spec" data-spec="${esc(s)}">${esc(s)}<small>${cnt(s)}</small></button>`).join('')}${S.vendors.some(v => !v.cats.length) ? `<button class="chip ${vspec === '__none' ? 'on' : ''}" data-act="v-spec" data-spec="__none">No category<small>${S.vendors.filter(v => !v.cats.length).length}</small></button>` : ''}</div>
+    <div class="sheet"><table class="grid"><thead><tr><th>Short name</th><th>Full name</th><th>Contact person</th><th>Number</th><th>Email</th><th>Categories</th><th>Vehicle brands</th><th></th></tr></thead><tbody>
+    ${l.map(v => `<tr><td class="txt vhead"><b>${esc(v.short)}</b></td><td class="txt${v.name === v.short ? ' none' : ''}" data-label="Full name">${esc(v.name)}</td><td class="txt${v.contact ? '' : ' none'}" data-label="Contact">${esc(v.contact)}</td><td class="txt${v.phone ? '' : ' none'}" style="white-space:nowrap" data-label="Number">${phoneLinks(v.phone)}</td>
+      <td class="txt" data-label="Email">${v.email ? `<a href="mailto:${esc(v.email)}">${esc(v.email)}</a>` : '<span class="tag no">No email</span>'}</td><td class="txt${v.cats.length ? '' : ' none'}" data-label="Categories">${v.cats.map(c => `<span class="tag cat">${esc(c)}</span>`).join('')}</td><td class="txt${v.brands ? '' : ' none'}" data-label="Vehicle brands">${esc(v.brands)}</td>
+      <td class="ctrl" style="width:120px;white-space:nowrap"><button class="ghost" data-act="v-edit" data-id="${v.id}">Edit</button><button class="x" title="Delete vendor" data-act="v-del" data-id="${v.id}">×</button></td></tr>`).join('') || '<tr><td colspan="8" class="empty">No vendors match.</td></tr>'}
+    </tbody></table></div>`;
+}
+function editVendor(id) {
+  const v = S.vendors.find(x => x.id === id) || { id: null, name: '', short: '', contact: '', phone: '', email: '', cats: [], brands: '' };
+  const sel = new Set(v.cats);
+  const F = [['name', 'Full name', 'full'], ['short', 'Short name (shown in comparisons and emails)', 'full'], ['contact', 'Contact person'], ['phone', 'Number'], ['email', 'Email', 'full'], ['brands', 'Vehicle brands (optional, e.g. Toyota, Nissan)', 'full']];
+  openModal(`<header><h2>${v.id ? 'Edit vendor' : 'Add vendor'}</h2></header><div class="content"><div class="form">
+    ${F.slice(0, 5).map(([k, l, w]) => `<label class="${w || ''}">${l}<input data-k="${k}" value="${esc(v[k])}"></label>`).join('')}
+    <div class="full" style="grid-column:1/-1"><div style="font-size:13px;color:var(--mute);margin-bottom:6px">Categories — select all that apply</div><div class="catpick" id="catpick"></div>
+      <div class="catnew"><input id="catnew" placeholder="New category, e.g. Lubricants"><button data-m="catadd">Add category</button></div></div>
+    <label class="full">${F[5][1]}<input data-k="brands" value="${esc(v.brands)}"></label></div></div>
+    <footer><button data-m="cancel">Cancel</button><button class="primary" data-m="save">${v.id ? 'Save vendor' : 'Add vendor'}</button></footer>`, m => {
+    const drawCats = () => { m.querySelector('#catpick').innerHTML = S.categories.map(c => `<button type="button" class="chip ${sel.has(c) ? 'on' : ''}" data-cat="${esc(c)}" aria-pressed="${sel.has(c)}">${esc(c)}</button>`).join(''); };
+    drawCats();
+    m.querySelector('#catpick').onclick = e => { const b = e.target.closest('[data-cat]'); if (!b) return; const c = b.dataset.cat; sel.has(c) ? sel.delete(c) : sel.add(c); drawCats(); };
+    const addCat = () => { const i = m.querySelector('#catnew'), c = i.value.trim(); if (!c) return i.focus(); const ex = S.categories.find(x => norm(x) === norm(c)); const name = ex || c; if (!ex) { S.categories.push(c); touch(); } sel.add(name); i.value = ''; drawCats(); toast(ex ? `“${name}” selected` : `Category “${name}” added`); };
+    m.querySelector('[data-m=catadd]').onclick = addCat;
+    m.querySelector('#catnew').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); addCat(); } };
+    const nameI = m.querySelector('[data-k=name]'), shortI = m.querySelector('[data-k=short]');
+    nameI.oninput = () => { if (!v.id && !shortI.dataset.touched) shortI.value = shortFromName(nameI.value); };
+    shortI.oninput = () => shortI.dataset.touched = '1';
+    m.querySelector('[data-m=cancel]').onclick = closeModal;
+    m.querySelector('[data-m=save]').onclick = () => {
+      const d = {}; m.querySelectorAll('[data-k]').forEach(i => d[i.dataset.k] = i.value.trim()); d.cats = S.categories.filter(c => sel.has(c));
+      if (!d.name && !d.short) return toast('Enter a vendor name.', true);
+      d.short = d.short || shortFromName(d.name); d.name = d.name || d.short;
+      if (S.vendors.some(x => x.id !== v.id && norm(x.short) === norm(d.short))) return toast(`Short name “${d.short}” is already used by another vendor.`, true);
+      if (d.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) return toast('That email address does not look right.', true);
+      if (v.id) { const old = v.short; Object.assign(v, d); if (norm(old) !== norm(d.short)) renameSupplier(old, d.short); }
+      else S.vendors.push(Object.assign({ id: uid() }, d));
+      touch(); closeModal(); renderView(); toast(v.id ? 'Vendor saved' : 'Vendor added');
+    };
+  });
+}
+function renameSupplier(oldS, newS) {
+  let n = 0; S.history.forEach(h => { if (norm(h.supplier) === norm(oldS)) { h.supplier = newS; n++; } });
+  S.cmp.sups.forEach(s => { if (norm(s.name) === norm(oldS)) s.name = newS; });
+  S.rfq.sentTo = S.rfq.sentTo.map(x => norm(x) === norm(oldS) ? newS : x);
+  if (n) toast(`Renamed in ${plural(n, 'history price')}`);
+}
+async function importVendors() {
+  const f = await pickFile('.xlsx,.xlsm,.xls,.csv'); if (!f) return;
+  try { await loadScript(XLSX_URL); } catch (e) { return toast('Excel import needs an internet connection to load the Excel reader.', true); }
+  let rows; try { const wb = XLSX.read(await f.arrayBuffer()); const ws = wb.Sheets[wb.SheetNames.find(n => /vendor/i.test(n)) || wb.SheetNames[0]]; rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' }); }
+  catch (e) { return toast('Could not read that file.', true); }
+  const MAP = { name: ['vendorname', 'name', 'vendor', 'fullname', 'suppliername', 'supplier'], short: ['shortname', 'short'], contact: ['contactperson', 'contact', 'contactname'], phone: ['number', 'phone', 'mobile', 'contactnumber', 'phonenumber', 'tel'], email: ['email', 'emailid', 'mail', 'emailaddress'], brands: ['brands', 'brand', 'vehiclebrands', 'makes', 'specialty', 'speciality'], cats: ['category', 'categories'] };
+  const hi = rows.findIndex(r => r.some(c => MAP.name.includes(norm(c))));
+  if (hi < 0) return toast('No “Vendor Name” column found in that sheet.', true);
+  const col = {}; rows[hi].forEach((c, i) => { for (const k in MAP) if (col[k] === undefined && MAP[k].includes(norm(c))) col[k] = i; });
+  let add = 0, upd = 0;
+  rows.slice(hi + 1).forEach(r => {
+    const g = k => col[k] === undefined ? '' : String(r[col[k]] ?? '').trim();
+    const name = g('name'); if (!name) return;
+    const d = { name, short: g('short'), contact: g('contact'), phone: g('phone'), email: g('email'), brands: g('brands') };
+    if (col.cats !== undefined) {
+      d.cats = g('cats').split(/[,;\/]/).map(x => x.trim()).filter(Boolean).map(c => { const ex = S.categories.find(x => norm(x) === norm(c)); if (!ex) S.categories.push(c); return ex || c; });
+    } else if (d.brands) { const sp = splitSpecialty(d.brands, name, S.categories); d.cats = sp.cats; d.brands = sp.brands; }
+    const ex = S.vendors.find(v => norm(v.name) === norm(name) || (d.short && norm(v.short) === norm(d.short)));
+    if (ex) { const old = ex.short; ['name', 'contact', 'phone', 'email', 'brands', 'short'].forEach(k => { if (d[k]) ex[k] = d[k]; }); if (d.cats && d.cats.length) ex.cats = d.cats; if (norm(old) !== norm(ex.short)) renameSupplier(old, ex.short); upd++; }
+    else { let s = d.short || shortFromName(name), base = s, i = 2; while (S.vendors.some(v => norm(v.short) === norm(s))) s = `${base} ${i++}`; S.vendors.push({ id: uid(), ...d, cats: d.cats || [], short: s }); add++; }
+  });
+  touch(); renderView(); toast(`Vendor import: ${add} added, ${upd} updated`);
+}
+
+/* ---------- Items ---------- */
+let iq = '';
+function vItems() {
+  const idx = S.items.map((it, i) => [it, i]);
+  const l = iq.trim() ? rank(idx, x => [x[0].code, x[0].desc, x[0].brand], iq) : idx.slice().sort((a, b) => a[0].code.localeCompare(b[0].code));
+  const cnt = new Map(); S.history.forEach(h => cnt.set(norm(h.code), (cnt.get(norm(h.code)) || 0) + 1));
+  return `<div class="bar"><div><h1>Items</h1><p>${plural(S.items.length, 'item')} — these feed the item number suggestions</p></div>
+    <div class="actions"><input class="search" id="iq" placeholder="Search item number or description" value="${esc(iq)}"><button class="primary" data-act="i-add">Add item</button></div></div>
+    <div class="sheet"><table class="grid" data-scope="items"><thead><tr><th class="w-code">Item number</th><th style="min-width:320px">Description</th><th style="width:160px">Brand</th><th class="num">Quotes</th><th>Last best</th><th></th></tr></thead><tbody>
+    ${l.map(([it, i]) => { const lq = lastQuote(it.code); return `<tr data-i="${i}"><td class="w-code" data-label="Item number"><input data-f="code" value="${esc(it.code)}"></td><td data-label="Description"><input data-f="desc" value="${esc(it.desc)}"></td><td data-label="Brand"><input data-f="brand" data-ac="brand" value="${esc(it.brand)}"></td>
+      <td class="txt num" data-label="Quotes">${cnt.get(norm(it.code)) || ''}</td><td class="txt" data-label="Last best">${lq ? `${money(lq.price)} <span class="muted">${esc(lq.supplier)}</span>` : ''}</td>
+      <td class="ctrl"><button class="x" title="Delete item" data-act="i-del" data-i="${i}">×</button></td></tr>`; }).join('') || '<tr><td colspan="6" class="empty">No items match.</td></tr>'}
+    </tbody></table></div>`;
+}
+
+/* ---------- Data & backup ---------- */
+function vDataPhone() {
+  const ps = phoneSync(), un = phoneUnsent();
+  return `<div class="bar"><div><h1>Data & backup</h1><p>On this phone, data is saved in the phone's storage.</p></div></div>
+  <div class="panels">
+    <div class="panel"><h2>Weekend sync with the PC</h2>
+      <dl class="kv"><dt>Loaded from PC</dt><dd>${ps.loadedAt ? esc(fmtWhen(ps.loadedAt)) : '—'}</dd><dt>Sent to PC</dt><dd>${ps.sentAt ? esc(fmtWhen(ps.sentAt)) : '—'}</dd>
+      <dt>Changes not on PC</dt><dd style="color:${un ? 'var(--amber)' : 'inherit'}">${un ? 'Yes — send to PC' : 'None'}</dd><dt>On this phone</dt><dd>${counts(S)}</dd></dl>
+      <div class="actions"><button class="${un ? 'primary' : ''}" data-act="ph-send">Send to PC</button><button data-act="ph-load">Load from PC file</button></div></div>
+    <div class="panel"><h2>How the weekend handoff works</h2><ol>
+      <li>Friday on the PC: <b>Data &amp; backup → Send to phone</b>, then WhatsApp the file to this phone.</li>
+      <li>Here: <b>Load from PC file</b> and pick that file.</li>
+      <li>Work as usual — everything saves on the phone.</li>
+      <li>Monday: <b>Send to PC</b> → WhatsApp. On the PC: <b>Load phone file</b>.</li></ol></div>
+    ${vDataShared()}
+  </div>`;
+}
+function vData() {
+  if (PHONE) return vDataPhone();
+  const st = { file: 'Connected — saving automatically', 'needs-permission': 'Disconnected — needs permission', browser: 'Not connected — browser storage only', none: 'Not set up' }[storage];
+  return `<div class="bar"><div><h1>Data & backup</h1><p>Everything lives in one JSON data file on your drive.</p></div></div>
+  <div class="panels">
+    <div class="panel"><h2>Data file</h2>
+      <dl class="kv"><dt>Status</dt><dd>${st}</dd><dt>File</dt><dd>${esc(handle ? handle.name : '—')}</dd><dt>Last saved</dt><dd>${S.meta.savedAt ? esc(new Date(S.meta.savedAt).toLocaleString()) : '—'}</dd>
+      <dt>Contents</dt><dd>${plural(S.vendors.length, 'vendor')}, ${plural(S.items.length, 'item')}, ${plural(S.history.length, 'price')}, ${plural(S.pending.length, 'pending draft')}</dd></dl>
+      ${fsOK ? '' : '<p style="color:var(--amber)">This browser can’t write to files. Use Chrome or Edge.</p>'}
+      <div class="actions">${storage === 'needs-permission' ? '<button class="primary" data-act="reconnect">Reconnect</button>' : ''}<button data-act="d-open" ${fsOK ? '' : 'disabled'}>Open another data file</button><button data-act="d-create" ${fsOK ? '' : 'disabled'}>Save to a new data file</button></div></div>
+    <div class="panel"><h2>Phone (weekends)</h2>
+      <p>${pcAway() ? `Data was sent to the phone on <b>${esc(fmtWhen(pcAway().at))}</b>. Load the phone file when you're back.` : 'Send your data to the Galaxy for the weekend, and load it back on Monday.'}</p>
+      <div class="actions"><button class="${pcAway() ? '' : 'primary'}" data-act="pc-send-phone">Send to phone</button><button class="${pcAway() ? 'primary' : ''}" data-act="pc-load-phone">Load phone file</button></div></div>
+    <div class="panel"><h2>Backup & restore</h2><p>A backup is a complete copy of everything — vendors, items, history, pending drafts, and your current quote request and comparison — in one .json file.</p>
+      <div class="actions"><button class="primary" data-act="d-backup">Download full backup</button><button data-act="d-restore">Restore from backup</button></div></div>
+  ${vDataShared()}
+    <div class="panel"><h2>Moving to a new computer</h2><ol>
+      <li>On the old computer, click <b>Download full backup</b>.</li>
+      <li>Copy <b>PriceDesk.html</b> and the backup file to the new computer.</li>
+      <li>Open PriceDesk.html in Chrome or Edge and choose <b>Restore from a backup</b>.</li>
+      <li>Pick where to keep the data file. You continue exactly where you left off.</li></ol></div>
+  </div>`;
+}
+function vDataShared() {
+  return `
+    <div class="panel"><h2>Branches</h2><p>Shown in the branch dropdown in Quote request and Comparison. Renaming a branch here doesn't change inquiries already saved.</p>
+      <div id="brlist" style="display:grid;gap:6px;margin-bottom:10px">${S.branches.map((b, i) => `<div style="display:flex;gap:6px"><input class="search" style="min-width:0;flex:1" data-br="${i}" value="${esc(b)}" aria-label="Branch name"><button class="x" title="Remove branch" data-act="br-del" data-i="${i}">×</button></div>`).join('')}</div>
+      <div class="actions"><button data-act="br-add">Add branch</button></div></div>
+    <div class="panel"><h2>Vendor categories</h2><p>Used for vendor categories and the filters in Vendors and Email vendors. Renaming or removing a category updates every vendor that has it.</p>
+      <div id="catlist" style="display:grid;gap:6px;margin-bottom:10px">${S.categories.map((c, i) => `<div style="display:flex;gap:6px;align-items:center"><input class="search" style="min-width:0;flex:1" data-cat-i="${i}" value="${esc(c)}" aria-label="Category name"><span class="muted" style="font-size:12.5px;width:70px">${plural(S.vendors.filter(v => v.cats.includes(c)).length, 'vendor')}</span><button class="x" title="Remove category" data-act="cat-del" data-i="${i}">×</button></div>`).join('')}</div>
+      <div class="actions"><button data-act="cat-add">Add category</button></div></div>
+    <div class="panel"><h2>Export to Excel</h2><p>One workbook with three sheets: Vendors, Items and Price History. Loading the Excel writer needs an internet connection.</p>
+      <div class="actions"><button data-act="d-xlsx">Export to Excel</button>${PHONE ? '<button data-act="d-backup">Download full backup</button>' : ''}</div></div>`;
+}
+async function exportExcel() {
+  try { await loadScript(XLSX_URL); } catch (e) { return toast('Could not load the Excel writer. Check your internet connection and try again.', true); }
+  const low = lowestSet();
+  const sheets = {
+    Vendors: S.vendors.slice().sort((a, b) => a.short.localeCompare(b.short)).map(v => ({ 'Short Name': v.short, 'Vendor Name': v.name, 'Contact Person': v.contact, 'Number': v.phone, 'Email': v.email, 'Categories': catLine(v), 'Vehicle Brands': v.brands })),
+    Items: S.items.slice().sort((a, b) => a.code.localeCompare(b.code)).map(i => ({ 'Item Number': i.code, 'Description': i.desc, 'Brand': i.brand })),
+    'Price History': S.history.slice().sort((a, b) => a.inq - b.inq).map(h => ({ 'Date': h.date, 'Inquiry No': h.inq, 'Reference': h.ref, 'Branch': h.branch, 'PRN': h.prn, 'Item Number': h.code, 'Description': h.desc, 'Supplier': h.supplier, 'Model': h.model, 'Quoted Price': h.price, 'Negotiated Price': hasNeg(h) ? h.final : '', 'Qty': h.qty, 'Available Qty': h.avail ?? '', 'Lowest?': low.get(h.inq + '|' + norm(h.code)) === effP(h) ? 'Yes' : 'No' }))
+  };
+  const wb = XLSX.utils.book_new();
+  for (const [n, rows] of Object.entries(sheets)) {
+    const ws = XLSX.utils.json_to_sheet(rows.length ? rows : [{}]);
+    const keys = rows.length ? Object.keys(rows[0]) : [];
+    ws['!cols'] = keys.map(k => ({ wch: Math.min(45, Math.max(k.length, ...rows.map(r => String(r[k] ?? '').length)) + 2) }));
+    XLSX.utils.book_append_sheet(wb, ws, n);
+  }
+  XLSX.writeFile(wb, `PriceDesk-export-${today()}.xlsx`); toast('Excel file downloaded');
+}
+
+/* ---------- clicks & search inputs ---------- */
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const a = b.dataset.act;
+  const acts = {
+    'reconnect': reconnect, 'goto-data': () => go('data'),
+    'rfq-del': () => { S.rfq.rows = S.rfq.rows.filter(r => r.id !== b.dataset.id); touch(); renderView(); },
+    'rfq-clear': () => { if ((rfqFilled().length || S.rfq.branch || S.rfq.prn) && !confirm('Clear all items, the branch and the PRN from the quote request?')) return; S.rfq.rows = []; S.rfq.branch = ''; S.rfq.prn = ''; touch(); renderView(); },
+    'rfq-copy': rfqCopy, 'rfq-email': openEmailPicker, 'rfq-to-cmp': rfqToCmp,
+    'cmp-del': () => { const id = b.dataset.id; S.cmp.rows = S.cmp.rows.filter(r => r.id !== id); Object.keys(S.cmp.cells).forEach(k => k.startsWith(id + '|') && delete S.cmp.cells[k]); touch(); renderView(); },
+    'sup-del': () => { const id = b.dataset.s, s = S.cmp.sups.find(x => x.id === id); const has = Object.keys(S.cmp.cells).some(k => k.endsWith('|' + id)); if (has && !confirm(`Remove ${s.name} and the prices entered for it?`)) return; S.cmp.sups = S.cmp.sups.filter(x => x.id !== id); Object.keys(S.cmp.cells).forEach(k => k.endsWith('|' + id) && delete S.cmp.cells[k]); touch(); renderView(); },
+    'sup-focus': () => { if (matchMedia('(max-width:760px)').matches) setCmpFocus(b.dataset.s); },
+    'neg-open': () => openNeg(b.closest('td')), 'qty-open': () => openQty(b.closest('td')), 'pq-open': () => openPasteQuote(b.dataset.s), 'cmp-img': () => shareGridImage(cmpGrid(), imgTitle(fmtRef(S.cmp), S.cmp.date)),
+    'h-img': () => { const hs = S.history.filter(h => h.inq === +b.dataset.inq); shareGridImage(histGroupGrid(hs), imgTitle((hs.find(h => h.ref) || {}).ref || `Inquiry #${b.dataset.inq}`, hs[0] && hs[0].date)); },
+    'cmp-copy': () => cmpCopy(false), 'cmp-copy-sum': () => cmpCopy(true), 'cmp-save': cmpSave, 'cmp-cancel': cmpCancel, 'cmp-park': cmpPark,
+    'p-open': () => openPending(b.dataset.id),
+    'p-copy': async () => { const p = S.pending.find(x => x.id === b.dataset.id); if (!p) return; const g = withCmp(p.cmp, cmpGrid); if (!g.sups.length) return toast('This draft has no prices yet.', true); const t = gridToEmail(g, false); (await copyRich(t.html, t.text)) ? toast('Copied: ' + draftName(p.cmp)) : toast('Copy failed.', true); },
+    'p-del': () => { const p = S.pending.find(x => x.id === b.dataset.id); if (!p || !confirm(`Delete the pending draft “${draftName(p.cmp)}”?\n\nIts prices have not been saved to history.`)) return; S.pending = S.pending.filter(x => x !== p); touch(); renderTabs(); renderView(); toast('Draft deleted'); },
+    'h-mode': () => { hmode = b.dataset.m; renderView(); },
+    'h-copy': async () => { const t = gridToEmail(histGroupGrid(S.history.filter(h => h.inq === +b.dataset.inq)), false); (await copyRich(t.html, t.text)) ? toast('Copied inquiry #' + b.dataset.inq) : toast('Copy failed.', true); },
+    'h-open': () => openInquiry(+b.dataset.inq),
+    'h-del': () => { const i = +b.dataset.inq; if (!confirm(`Delete inquiry #${i} and all its prices from history?`)) return; S.history = S.history.filter(h => h.inq !== i); if (S.cmp.inq === i) S.cmp.inq = null; touch(); renderView(); toast('Inquiry #' + i + ' deleted'); },
+    'h-del-row': () => { if (!confirm('Delete this price from history?')) return; S.history = S.history.filter(h => h.id !== b.dataset.id); touch(); renderView(); },
+    'v-add': () => editVendor(null), 'v-edit': () => editVendor(b.dataset.id), 'v-import': importVendors,
+    'v-spec': () => { vspec = vspec === b.dataset.spec ? '' : b.dataset.spec; renderView(); },
+    'v-del': () => { const v = S.vendors.find(x => x.id === b.dataset.id); if (!v || !confirm(`Delete ${v.short} from the vendor list?\n\nPast prices from this supplier stay in history.`)) return; S.vendors = S.vendors.filter(x => x !== v); touch(); renderView(); },
+    'i-add': () => { iq = ''; S.items.unshift({ code: '', desc: '', brand: '' }); renderView(); const f = $('[data-scope=items] tbody tr [data-f=code]'); f && f.focus(); },
+    'i-del': () => { const it = S.items[+b.dataset.i]; if (!it || !confirm(`Delete item ${it.code || '(blank)'}? Past prices stay in history.`)) return; S.items.splice(+b.dataset.i, 1); touch(); renderView(); },
+    'br-add': () => { S.branches.push('New branch'); touch(); renderView(); const l = $$('#brlist input'); const el = l[l.length - 1]; el.focus(); el.select(); },
+    'br-del': () => { const i = +b.dataset.i; if (S.branches.length < 2) return toast('Keep at least one branch.', true); if (!confirm(`Remove “${S.branches[i]}” from the branch list?\n\nInquiries already saved keep their reference.`)) return; S.branches.splice(i, 1); touch(); renderView(); },
+    'cat-add': () => { let n = 'New category', k = 2; while (S.categories.includes(n)) n = `New category ${k++}`; S.categories.push(n); touch(); renderView(); const l = $$('#catlist input'); const el = l[l.length - 1]; el.focus(); el.select(); },
+    'cat-del': () => { const c = S.categories[+b.dataset.i], n = S.vendors.filter(v => v.cats.includes(c)).length; if (!confirm(`Remove the category “${c}”?${n ? `\n\nIt will be removed from ${plural(n, 'vendor')}.` : ''}`)) return; S.categories.splice(+b.dataset.i, 1); S.vendors.forEach(v => { v.cats = v.cats.filter(x => x !== c); }); if (vspec === c) vspec = ''; touch(); renderView(); },
+    'd-backup': backupNow, 'ph-send': sendToPC, 'ph-load': loadFromPC, 'pc-send-phone': sendToPhone, 'pc-load-phone': loadPhoneFile,
+    'pc-away-clear': () => { if (!confirm('Clear the reminder? Only do this if you are not going to load a file from the phone.')) return; LS.set('pd-away', null); renderBanner(); if (tab === 'data') renderView(); }, 'd-restore': restoreBackup, 'd-xlsx': exportExcel,
+    'd-open': openDataFile, 'd-create': () => createDataFile()
+  };
+  acts[a] && acts[a]();
+});
+document.addEventListener('change', e => { if (e.target.id === 'hbranch') { hbranch = e.target.value; renderView(); } });
+document.addEventListener('change', e => { const i = e.target.dataset && e.target.dataset.br; if (i === undefined) return; const v = e.target.value.trim(); if (!v) { e.target.value = S.branches[+i]; return; } S.branches[+i] = v; touch(); toast('Branch renamed'); });
+document.addEventListener('change', e => {
+  const i = e.target.dataset && e.target.dataset.catI; if (i === undefined) return;
+  const old = S.categories[+i], v = e.target.value.trim();
+  if (!v || S.categories.some((c, j) => j !== +i && norm(c) === norm(v))) { e.target.value = old; return toast(v ? 'That category already exists.' : 'Category name can’t be empty.', true); }
+  S.categories[+i] = v; S.vendors.forEach(x => { x.cats = x.cats.map(c => c === old ? v : c); }); touch(); renderView(); toast('Category renamed');
+});
+let searchT;
+document.addEventListener('input', e => {
+  const id = e.target.id; if (!['hq', 'vq', 'iq'].includes(id)) return;
+  const val = e.target.value; if (id === 'hq') hq = val; else if (id === 'vq') vq = val; else iq = val;
+  clearTimeout(searchT); searchT = setTimeout(() => { const pos = e.target.selectionStart; renderView(); const el = $('#' + id); el.focus(); el.setSelectionRange(pos, pos); }, 150);
+});
+window.addEventListener('beforeunload', e => { if (pending) { persist(); e.preventDefault(); e.returnValue = ''; } });
+/* drop blank items when leaving the Items tab */
+const _go = go; go = t => { if (tab === 'items') { const n = S.items.length; S.items = S.items.filter(i => String(i.code).trim()); if (S.items.length !== n) touch(); } _go(t); };
+
+/* ---------- theme: auto (follows Windows) / light / dark ---------- */
+const THEMES = ['auto', 'light', 'dark'];
+const ICONS = { auto: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 2a6 6 0 0 0 0 12z" fill="currentColor"/></svg>', light: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3"/></svg>', dark: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 10.5A6 6 0 0 1 5.5 2.5a6 6 0 1 0 8 8z"/></svg>' };
+const themePref = () => { try { return localStorage.getItem('pd-theme') || 'auto'; } catch (e) { return 'auto'; } };
+function applyTheme() {
+  const p = themePref(), dark = p === 'dark' || (p === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  const b = $('#themeBtn'); b.innerHTML = ICONS[p] + `<span>${p === 'auto' ? 'Auto' : p === 'light' ? 'Light' : 'Dark'}</span>`;
+  b.title = `Theme: ${p === 'auto' ? 'follows your Windows setting' : p} — click to change`;
+}
+$('#themeBtn').addEventListener('click', () => { const p = THEMES[(THEMES.indexOf(themePref()) + 1) % 3]; try { localStorage.setItem('pd-theme', p); } catch (e) {} applyTheme(); });
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+applyTheme();
+/* installable app when served from a web address (GitHub Pages); the local PC file skips this */
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(() => {});
+
+boot();
+</script>
+</body>
+</html>
